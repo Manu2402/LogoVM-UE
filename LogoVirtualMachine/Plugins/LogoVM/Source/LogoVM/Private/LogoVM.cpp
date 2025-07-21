@@ -2,10 +2,11 @@
 // @ Manuel Solano
 
 #include "LogoVM.h"
-
-DEFINE_LOG_CATEGORY(LoggerLogoVM);
+#include "LogoVMUtility.h"
 
 #define LOCTEXT_NAMESPACE "FLogoVMModule"
+
+DEFINE_LOG_CATEGORY(LoggerLogoVM);
 
 void FLogoVMModule::StartupModule()
 {
@@ -26,43 +27,14 @@ bool FLogoVMModule::Exec(UWorld* InWorld, const TCHAR* Cmd /* Command's Steam */
 	}
 
 	const FString FilePath = FParse::Token(Cmd, false);
-	if (!FilePathIsValid(FilePath))
+	if (!LogoVM::Utility::FilePathIsValid(FilePath))
 	{
 		return false;
 	}
-
-	// TODO: Implement Unit Tests
 
 	// Loading .logo file, and read it.
 	// ...
 
-	return true;
-}
-
-bool FLogoVMModule::FilePathIsValid(const FString& InFilePath) const
-{
-	if (InFilePath.IsEmpty())
-	{
-		UE_LOG(LoggerLogoVM, Warning, TEXT("There isn't filepath!"))
-		return false;
-	}
-	
-	TArray<FString> FilePathTokens;
-	InFilePath.ParseIntoArray(FilePathTokens, TEXT("."));
-
-	if (FilePathTokens.Num() <= 1)
-	{
-		UE_LOG(LoggerLogoVM, Error, TEXT("This filepath has no extension or has no name!"));
-		return false;
-	}
-	
-	if (!FilePathTokens.Last().Equals(TEXT("Logo")))
-	{
-		UE_LOG(LoggerLogoVM, Error, TEXT("This filepath doesn't represent a LOGO program!"));
-		return false;
-	}
-
-	// Correct Example: "logo path/to/logo/file.logo"
 	return true;
 }
 

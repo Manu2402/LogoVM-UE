@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 
-class LOGOVM_API FLogoVM
+namespace LogoVM
 {
-public:
-	FLogoVM();
-	~FLogoVM();
+	class LOGOVM_API FLogoVM
+	{
+	public:
+		FLogoVM();
+		~FLogoVM();
 	
-};
+	};
+}

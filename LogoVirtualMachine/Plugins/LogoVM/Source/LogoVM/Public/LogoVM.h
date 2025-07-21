@@ -18,7 +18,4 @@ public:
 	// FSelfRegisteringExec --> Console's commands listener.
 	virtual bool Exec(UWorld* InWorld, const TCHAR* Cmd, FOutputDevice& Ar) override;
 	
-private:
-	bool FilePathIsValid(const FString& InFilePath) const;
-	
 };

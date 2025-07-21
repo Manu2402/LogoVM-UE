@@ -3,7 +3,7 @@
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "LogoVM",
-	"Description": "A simple Virtual Machine for Logo programming language",
+	"Description": "A simple Virtual Machine for LOGO programming language",
 	"Category": "Other",
 	"CreatedBy": "Manu2402",
 	"CreatedByURL": "",
@@ -17,6 +17,11 @@
 	"Modules": [
 		{
 			"Name": "LogoVM",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "LogoVMTests",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

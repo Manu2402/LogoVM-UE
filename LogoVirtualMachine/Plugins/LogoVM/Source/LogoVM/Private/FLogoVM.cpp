@@ -2,10 +2,15 @@
 
 #include "FLogoVM.h"
 
-FLogoVM::FLogoVM()
+namespace LogoVM
 {
-}
+	FLogoVM::FLogoVM()
+	{
+		
+	}
 
-FLogoVM::~FLogoVM()
-{
+	FLogoVM::~FLogoVM()
+	{
+		
+	}
 }
