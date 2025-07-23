@@ -11,6 +11,14 @@ namespace LogoVM
 	public:
 		FLogoVM();
 		~FLogoVM();
+
+		void Tokenize(const FString& FileContent);
+
+		bool TokensEnqueue(const FString& Token);
+		bool TokensDequeue(FString& Token);
+
+	private:
+		TQueue<FString> Tokens;
 	
 	};
 }

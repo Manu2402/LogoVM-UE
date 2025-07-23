@@ -3,6 +3,7 @@
 
 #include "LogoVM.h"
 #include "LogoVMUtility.h"
+#include "FLogoVM.h"
 
 #define LOCTEXT_NAMESPACE "FLogoVMModule"
 
@@ -31,10 +32,18 @@ bool FLogoVMModule::Exec(UWorld* InWorld, const TCHAR* Cmd /* Command's Steam */
 	{
 		return false;
 	}
+	
+	FString FileContent;
+	if (!FFileHelper::LoadFileToString(FileContent, *FilePath))
+	{
+		return false;
+	}
 
-	// Loading .logo file, and read it.
-	// ...
-
+	LogoVM::FLogoVM LogoVM;
+	LogoVM.Tokenize(FileContent);
+	
+	// Interpret sequentially all tokens...
+	
 	return true;
 }
 
