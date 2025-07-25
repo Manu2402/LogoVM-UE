@@ -32,5 +32,18 @@ namespace LogoVM
 
 			return true;
 		}
+
+		void Tokenize(TQueue<FString>& OutTokens, const FString& FileContent)
+		{
+			TArray<FString> Tokens;
+			const TCHAR* Delimiters[] = { TEXT(" "), TEXT("\n") };
+			FileContent.ParseIntoArray(Tokens, Delimiters, UE_ARRAY_COUNT(Delimiters));
+
+			// Load tokens into a queue.
+			for (const FString& Token : Tokens)
+			{
+				OutTokens.Enqueue(Token);
+			}
+		}
 	}
 }

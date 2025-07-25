@@ -3,22 +3,35 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FLogoVM.h"
 
 namespace LogoVM
 {
 	class LOGOVM_API FLogoVM
 	{
+	using FCommand = TFunction<bool(FLogoVM& LogoVM, TQueue<FString>& Tokens)>;
+		
 	public:
 		FLogoVM();
+		FLogoVM(const FVector2D CanvasSize);
 		~FLogoVM();
+		
+		FLogoVM(const FLogoVM& Other) = delete;
+		FLogoVM(FLogoVM&& Other) = delete;
+		FLogoVM& operator=(const FLogoVM& Other) = delete;
+		FLogoVM& operator=(FLogoVM&& Other) = delete;
 
-		void Tokenize(const FString& FileContent);
+		bool Execute(TQueue<FString>& Tokens);
 
-		bool TokensEnqueue(const FString& Token);
-		bool TokensDequeue(FString& Token);
+		FVector2D GetCanvasSize() const;
 
 	private:
-		TQueue<FString> Tokens;
-	
+		FVector2D CanvasSize;
+		TMap<FString, FCommand> Commands;
+
+	private:
+		void InitLogoVM();
+
 	};
+	
 }
