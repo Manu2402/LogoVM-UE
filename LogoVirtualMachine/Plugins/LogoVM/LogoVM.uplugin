@@ -22,7 +22,7 @@
 		},
 		{
 			"Name": "LogoVMTests",
-			"Type": "Runtime",
+			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}
 	]

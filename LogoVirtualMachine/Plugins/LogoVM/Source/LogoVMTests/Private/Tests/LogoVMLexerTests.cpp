@@ -1,6 +1,6 @@
 ﻿// @ Manuel Solano
 
-#include "LogoVMUtility.h"
+#include "LogoVMUtils.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMLexerTest_Tokenize, "LogoVM.Lexer.Tokenize", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
@@ -9,7 +9,7 @@ bool FLogoVMLexerTest_Tokenize::RunTest(const FString& Parameters)
 	const FString LogoContent = TEXT("repeat 4 \n [ fd 100 rt 90 ] \n");
 
 	TQueue<FString> Tokens;
-	LogoVM::Utility::Tokenize(Tokens, LogoContent);
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
 
 	FString CurrentToken;
 

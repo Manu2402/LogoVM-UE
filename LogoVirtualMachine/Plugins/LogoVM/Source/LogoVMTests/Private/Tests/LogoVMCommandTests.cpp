@@ -1,6 +1,6 @@
 ﻿// @ Manuel Solano
 
-#include "LogoVM/Public/LogoVMUtility.h"
+#include "LogoVM/Public/LogoVMUtils.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMCommandTest_EmptyPath, "LogoVM.Command.EmptyPath", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
@@ -8,7 +8,7 @@ bool FLogoVMCommandTest_EmptyPath::RunTest(const FString& Parameters)
 {
 	const FString FilePath = TEXT("");
 	
-	TestFalse(TEXT("Logo command with empty file path should be invalid!"), LogoVM::Utility::FilePathIsValid(FilePath));
+	TestFalse(TEXT("Logo command with empty file path should be invalid!"), LogoVM::Utils::FilePathIsValid(FilePath));
 	
 	return true;
 }
@@ -19,7 +19,7 @@ bool FLogoVMCommandTest_MissingBaseName::RunTest(const FString& Parameters)
 {
 	const FString FilePath = TEXT(".logo");
 
-	TestFalse(TEXT("Logo command with missing base name should be invalid!"), LogoVM::Utility::FilePathIsValid(FilePath));
+	TestFalse(TEXT("Logo command with missing base name should be invalid!"), LogoVM::Utils::FilePathIsValid(FilePath));
 
 	return true;
 }
@@ -30,7 +30,7 @@ bool FLogoVMCommandTest_MissingExtension::RunTest(const FString& Parameters)
 {
 	const FString FilePath = TEXT("path/to/file");
 
-	TestFalse(TEXT("Logo command without extension as a file path's suffix should be invalid!"), LogoVM::Utility::FilePathIsValid(FilePath));
+	TestFalse(TEXT("Logo command without extension as a file path's suffix should be invalid!"), LogoVM::Utils::FilePathIsValid(FilePath));
 
 	return true;
 }
@@ -41,7 +41,7 @@ bool FLogoVMCommandTest_WrongExtension::RunTest(const FString& Parameters)
 {
 	const FString FilePath = TEXT("path/to/file.png");
 
-	TestFalse(TEXT("Logo command with a wrong extension as a file path's suffix should be invalid!"), LogoVM::Utility::FilePathIsValid(FilePath));
+	TestFalse(TEXT("Logo command with a wrong extension as a file path's suffix should be invalid!"), LogoVM::Utils::FilePathIsValid(FilePath));
 
 	return true;
 }
@@ -52,7 +52,7 @@ bool FLogoVMCommandTest_CorrectCommand::RunTest(const FString& Parameters)
 {
 	const FString FilePath = TEXT("path/to/file.logo");
 
-	TestTrue(TEXT("The correct Logo command should be valid!"), LogoVM::Utility::FilePathIsValid(FilePath));
+	TestTrue(TEXT("The correct Logo command should be valid!"), LogoVM::Utils::FilePathIsValid(FilePath));
 
 	return true;
 }

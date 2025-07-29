@@ -1,18 +1,17 @@
 // @ Manuel Solano
 
-#include "LogoVMUtility.h"
-#include "FLogoVM.h"
+#include "LogoVMUtils.h"
 #include "LogoVM.h"
 
 namespace LogoVM
 {
-	namespace Utility
+	namespace Utils
 	{
 		bool FilePathIsValid(const FString& InFilePath)
 		{
 			if (InFilePath.IsEmpty())
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("Logo command with empty file path is invalid!"))
+				UE_LOG(LoggerLogoVM, Warning, TEXT("A Logo command with empty file path is invalid!"))
 				return false;
 			}
 	
@@ -21,13 +20,13 @@ namespace LogoVM
 
 			if (FilePathTokens.Num() <= 1)
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("Logo command with missing base or with missing extension is invalid!"));
+				UE_LOG(LoggerLogoVM, Warning, TEXT("A Logo command with missing base or with missing extension is invalid!"));
 				return false;
 			}
 	
 			if (!FilePathTokens.Last().Equals(TEXT("logo")))
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("Logo command with a wrong extension as a file path's suffix is invalid!"));
+				UE_LOG(LoggerLogoVM, Warning, TEXT("A Logo command with a wrong extension as a file path's suffix is invalid!"));
 				return false;
 			}
 
@@ -52,17 +51,17 @@ namespace LogoVM
 			return Position.X < 0 || Position.X >= CanvasSize.X || Position.Y < 0 || Position.Y >= CanvasSize.Y;
 		}
 
-		bool TrySpawnCanvas(TArray<AActor*>& Tiles, UWorld* InWorld, const FIntPoint CanvasSize)
+		bool TrySpawnCanvas(TArray<AActor*>& OutCanvasTiles, UWorld* InWorld, const FIntPoint CanvasSize)
 		{
 			const uint32 CanvasResolution = CanvasSize.X * CanvasSize.Y;
-			Tiles.Empty(CanvasResolution);
+			OutCanvasTiles.Empty(CanvasResolution);
 		
-			// Spawn canvas, composed by cubes as tiles.
+			// Spawn canvas, composed by simple cubes as tiles.
 			UClass* CubeClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/LogoVM/Blueprints/BP_Cube.BP_Cube_C"));
 
 			if (!CubeClass)
 			{
-				UE_LOG(LoggerLogoVM, Error, TEXT("Unable to load the canvas!"));
+				UE_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when loading tile's body!"));
 				return false;
 			}
 
@@ -82,19 +81,19 @@ namespace LogoVM
 			{
 				for (int32 WidthIndex = 0; WidthIndex < CanvasSize.X; WidthIndex++)
 				{
-					AActor* Tile = InWorld->SpawnActor<AActor>(CubeClass, FVector::ZeroVector, Rotation, SpawnParameters);
-					if (!Tile)
+					AActor* CanvasTile = InWorld->SpawnActor<AActor>(CubeClass, FVector::ZeroVector, Rotation, SpawnParameters);
+					if (!CanvasTile)
 					{
-						UE_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: ACTOR!"));
+						UE_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when spawning a tile!"));
 						return false;
 					}
 
 					if (bFirstCube)
 					{
-						UStaticMeshComponent* StaticMeshComponent = Tile->FindComponentByClass<UStaticMeshComponent>();
+						UStaticMeshComponent* StaticMeshComponent = CanvasTile->FindComponentByClass<UStaticMeshComponent>();
 						if (!StaticMeshComponent)
 						{
-							UE_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: STATIC MESH"));
+							UE_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when spawning a tile's body!"));
 							return false;
 						}
 
@@ -104,10 +103,11 @@ namespace LogoVM
 						bFirstCube = false;
 					}
 			
-					FVector CurrentLocation = { CubeSize.X * WidthIndex, CubeSize.Y * HeightIndex, CubeDefaultSize.Z * CubeScale.Z * 0.5f };
-					Tile->SetActorLocation(CurrentLocation);
+					const FVector CurrentLocation = { CubeSize.X * WidthIndex, CubeSize.Y * HeightIndex, CubeDefaultSize.Z * CubeScale.Z * 0.5f };
+					CanvasTile->SetActorLocation(CurrentLocation);
 
-					Tiles.Add(Tile);
+					// Loading all the tiles.
+					OutCanvasTiles.Add(CanvasTile);
 				}
 			}
 

@@ -2,8 +2,8 @@
 // @ Manuel Solano
 
 #include "LogoVM.h"
-#include "LogoVMUtility.h"
-#include "FLogoVM.h"
+#include "LogoVMUtils.h"
+#include "LogoVMContext.h"
 #include "IContentBrowserSingleton.h"
 #include "Misc/OutputDeviceNull.h"
 
@@ -24,20 +24,22 @@ namespace LogoVM
 		// we call this function before unloading the module.
 	}
 
-	bool FLogoVMModule::Exec(UWorld* InWorld, const TCHAR* Cmd /* Command's Steam */, FOutputDevice& Ar /* Console */)
+	bool FLogoVMModule::Exec(UWorld* InWorld, const TCHAR* Cmd /* Command's stream */, FOutputDevice& Ar /* Console */)
 	{
 		if (!InWorld)
 		{
 			return false;
 		}
-	
+
+		// The command must start with the "logo" word!
 		if (!FParse::Command(&Cmd, TEXT("Logo")))
 		{
 			return false;
 		}
 
+		// The command must contain a valid file path to a ".logo" file!
 		const FString FilePath = FParse::Token(Cmd, false);
-		if (!Utility::FilePathIsValid(FilePath))
+		if (!Utils::FilePathIsValid(FilePath))
 		{
 			return false;
 		}
@@ -45,46 +47,48 @@ namespace LogoVM
 		FString FileContent;
 		if (!FFileHelper::LoadFileToString(FileContent, *FilePath))
 		{
-			UE_LOG(LoggerLogoVM, Error, TEXT("Loading failed: %s!"), *FilePath);
+			UE_LOG(LoggerLogoVM, Error, TEXT("Loading of \"%s\"'s content is failed!"), *FilePath);
 			return false;
 		}
 
 		TQueue<FString>	Tokens;
-		Utility::Tokenize(Tokens, FileContent);
+		Utils::Tokenize(Tokens, FileContent);
 	
-		FLogoVM LogoVM;
+		FLogoVMContext LogoVMContext;
 
-		TArray<AActor*> Tiles;
-		if (!Utility::TrySpawnCanvas(Tiles, InWorld, LogoVM.GetCanvasSize()))
+		TArray<AActor*> CanvasTiles;
+		if (!Utils::TrySpawnCanvas(CanvasTiles, InWorld, LogoVMContext.GetCanvasSize()))
 		{
 			return false;
 		}
 	
-		if (!LogoVM.Execute(Tokens))
+		if (!LogoVMContext.Execute(Tokens))
 		{
 			return false;
 		}
 
-		const TArray<FLinearColor>& TilesColors =  LogoVM.GetTilesColors();
+		const TArray<FLinearColor>& CanvasTilesColors =  LogoVMContext.GetCanvasTilesColors();
 
-		for (int32 Index = 0; Index < Tiles.Num(); Index++)
+		for (int32 Index = 0; Index < CanvasTiles.Num(); Index++)
 		{
 			// In order to call "Init", found in "BP_Cube".
 			const FString InitFunction = TEXT("Init");
 			
 			// In order to call "SetColor { R, G, B, A }", found in "BP_Cube".
-			// "Tiles" and "TilesColors" has same size at this point! So, i avoid overengineering.
-			const FString SetColorFunction = FString::Printf(TEXT("SetColor %s"), *(TilesColors[Index].ToString()));
+			// "CanvasTiles" and "CanvasTilesColors" has same size at this point! So, i avoid overengineering.
+			const FString SetColorFunction = FString::Printf(TEXT("SetColor %s"), *(CanvasTilesColors[Index].ToString()));
 
 			FOutputDeviceNull OutputDeviceNull;
 			
-			if (!Tiles[Index]->CallFunctionByNameWithArguments(*InitFunction, OutputDeviceNull, nullptr, true))
+			if (!CanvasTiles[Index]->CallFunctionByNameWithArguments(*InitFunction, OutputDeviceNull, nullptr, true))
 			{
+				UE_LOG(LoggerLogoVM, Error, TEXT("Unable to call the \"Init\" function in BP_Cube!"));
 				return false;
 			}
 			
-			if (!Tiles[Index]->CallFunctionByNameWithArguments(*SetColorFunction, OutputDeviceNull, nullptr, true))
+			if (!CanvasTiles[Index]->CallFunctionByNameWithArguments(*SetColorFunction, OutputDeviceNull, nullptr, true))
 			{
+				UE_LOG(LoggerLogoVM, Error, TEXT("Unable to call the \"SetColor\" function in BP_Cube!"));
 				return false;
 			}
 		}
