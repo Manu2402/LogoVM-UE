@@ -26,6 +26,8 @@ namespace LogoVM
 
 		FIntPoint GetCanvasSize() const;
 		const TArray<FLinearColor>& GetCanvasTilesColors() const;
+
+		FIntPoint GetTurtlePosition() const;
 		
 	private:
 		FIntPoint CanvasSize;

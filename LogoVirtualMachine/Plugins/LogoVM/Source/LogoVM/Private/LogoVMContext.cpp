@@ -32,11 +32,14 @@ namespace LogoVM
 		{
 			if (!Commands.Contains(CurrentToken))
 			{
-				UE_LOG(LoggerLogoVM, Error, TEXT("EXECUTION FAILED: the command \"%s\" is not supported at the time!"), *CurrentToken);
+				UE_LOG(LoggerLogoVM, Warning, TEXT("EXECUTION FAILED: the command \"%s\" is not supported at the time!"), *CurrentToken);
 				return false;
 			}
 
-			Commands[CurrentToken](Tokens);
+			if (!Commands[CurrentToken](Tokens))
+			{
+				return false;
+			}
 		}
 
 		return true;
@@ -60,7 +63,7 @@ namespace LogoVM
 
 			if (!ArgToken.IsNumeric())
 			{
-				UE_LOG(LoggerLogoVM, Error, TEXT("The forward command argument isn't a number!"));
+				UE_LOG(LoggerLogoVM, Warning, TEXT("The forward command argument isn't a number!"));
 				return false;
 			}
 
@@ -75,7 +78,7 @@ namespace LogoVM
 
 			if (Utils::IsOutOfBounds(NewPosition, CanvasSize))
 			{
-				UE_LOG(LoggerLogoVM, Error, TEXT("The forward command has finished with an out of bounds!"));
+				UE_LOG(LoggerLogoVM, Warning, TEXT("The forward command has finished with an out of bounds!"));
 				return false;
 			}
 
@@ -91,7 +94,7 @@ namespace LogoVM
 
 			if (!ArgToken.IsNumeric())
 			{
-				UE_LOG(LoggerLogoVM, Error, TEXT("The backward command argument isn't a number!"));
+				UE_LOG(LoggerLogoVM, Warning, TEXT("The backward command argument isn't a number!"));
 				return false;
 			}
 
@@ -99,14 +102,14 @@ namespace LogoVM
 			const FVector2D TurtleRotationVector = GetTurtleRotationVector();
 
 			FIntPoint TurtleTraslation;
-			TurtleTraslation.X = -(Arg * TurtleRotationVector.X);
-			TurtleTraslation.Y = -(Arg * TurtleRotationVector.Y);
+			TurtleTraslation.X = -(Arg * FMath::RoundToInt(TurtleRotationVector.X));
+			TurtleTraslation.Y = -(Arg * FMath::RoundToInt(TurtleRotationVector.Y));
 
 			const FIntPoint NewPosition = TurtlePosition + TurtleTraslation;
 
 			if (Utils::IsOutOfBounds(NewPosition, CanvasSize))
 			{
-				UE_LOG(LoggerLogoVM, Error, TEXT("The backward command has finished with an out of bounds!"));
+				UE_LOG(LoggerLogoVM, Warning, TEXT("The backward command has finished with an out of bounds!"));
 				return false;
 			}
 
@@ -177,6 +180,11 @@ namespace LogoVM
 	const TArray<FLinearColor>& FLogoVMContext::GetCanvasTilesColors() const
 	{
 		return CanvasTilesColors;
+	}
+
+	FIntPoint FLogoVMContext::GetTurtlePosition() const
+	{
+		return TurtlePosition;
 	}
 
 	void FLogoVMContext::Move(const FIntPoint OldTurtlePosition, const FIntPoint TurtleTraslation)
