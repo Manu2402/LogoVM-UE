@@ -11,7 +11,7 @@ namespace LogoVM
 		{
 			if (InFilePath.IsEmpty())
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("A Logo command with empty file path is invalid!"))
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("A Logo command with empty file path is invalid!"));
 				return false;
 			}
 	
@@ -20,13 +20,13 @@ namespace LogoVM
 
 			if (FilePathTokens.Num() <= 1)
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("A Logo command with missing base or with missing extension is invalid!"));
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("A Logo command with missing base or with missing extension is invalid!"));
 				return false;
 			}
 	
 			if (!FilePathTokens.Last().Equals(TEXT("logo")))
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("A Logo command with a wrong extension as a file path's suffix is invalid!"));
+				RUNTIME_LOG(LoggerLogoVM, Warning, TEXT("A Logo command with a wrong extension as a file path's suffix is invalid!"));
 				return false;
 			}
 
@@ -61,7 +61,7 @@ namespace LogoVM
 
 			if (!CubeClass)
 			{
-				UE_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when loading tile's body!"));
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when loading tile's body!"));
 				return false;
 			}
 
@@ -84,7 +84,7 @@ namespace LogoVM
 					AActor* CanvasTile = InWorld->SpawnActor<AActor>(CubeClass, FVector::ZeroVector, Rotation, SpawnParameters);
 					if (!CanvasTile)
 					{
-						UE_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when spawning a tile!"));
+						RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when spawning a tile!"));
 						return false;
 					}
 
@@ -93,7 +93,7 @@ namespace LogoVM
 						UStaticMeshComponent* StaticMeshComponent = CanvasTile->FindComponentByClass<UStaticMeshComponent>();
 						if (!StaticMeshComponent)
 						{
-							UE_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when spawning a tile's body!"));
+							RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when spawning a tile's body!"));
 							return false;
 						}
 

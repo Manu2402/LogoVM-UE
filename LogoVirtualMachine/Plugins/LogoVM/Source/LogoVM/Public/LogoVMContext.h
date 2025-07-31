@@ -33,15 +33,15 @@ namespace LogoVM
 		FIntPoint CanvasSize;
 		TMap<FString, FCommand> Commands;
 		TArray<FLinearColor> CanvasTilesColors;
+		FLinearColor ActiveColor;
 		FIntPoint TurtlePosition;
 		double TurtleRotation; // Rotations are represented inversely, using clock-wise direction.
 		bool bIsTurtleUp;
 
 	private:
 		void InitLogoVM();
-		void Move(const FIntPoint OldTurtlePosition, const FIntPoint TurtleTraslation);
-		
 		FVector2D GetTurtleRotationVector() const;
+		void Move(const FIntPoint OldTurtlePosition, const FIntPoint TurtleTraslation);
 
 	};
 }

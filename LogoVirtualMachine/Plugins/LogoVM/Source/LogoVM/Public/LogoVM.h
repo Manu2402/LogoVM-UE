@@ -7,6 +7,12 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LoggerLogoVM, Log, All);
 
+#define RUNTIME_LOG(CategoryName, Verbosity, FormatString, ...)         \
+	if (!GIsAutomationTesting)                                          \
+	{                                                                   \
+		UE_LOG(CategoryName, Verbosity, FormatString, ##__VA_ARGS__)    \
+	}                                                                   \
+
 namespace LogoVM
 {
 	class FLogoVMModule : public IModuleInterface, public FSelfRegisteringExec

@@ -3,7 +3,6 @@
 #include "LogoVM/Public/LogoVMUtils.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMCommandTest_EmptyPath, "LogoVM.Command.EmptyPath", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
-
 bool FLogoVMCommandTest_EmptyPath::RunTest(const FString& Parameters)
 {
 	const FString FilePath = TEXT("");
@@ -14,7 +13,6 @@ bool FLogoVMCommandTest_EmptyPath::RunTest(const FString& Parameters)
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMCommandTest_MissingBaseName, "LogoVM.Command.MissingBaseName", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
-
 bool FLogoVMCommandTest_MissingBaseName::RunTest(const FString& Parameters)
 {
 	const FString FilePath = TEXT(".logo");
@@ -25,7 +23,6 @@ bool FLogoVMCommandTest_MissingBaseName::RunTest(const FString& Parameters)
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMCommandTest_MissingExtension, "LogoVM.Command.MissingExtension", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
-
 bool FLogoVMCommandTest_MissingExtension::RunTest(const FString& Parameters)
 {
 	const FString FilePath = TEXT("path/to/file");
@@ -36,7 +33,6 @@ bool FLogoVMCommandTest_MissingExtension::RunTest(const FString& Parameters)
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMCommandTest_WrongExtension, "LogoVM.Command.WrongExtension", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
-
 bool FLogoVMCommandTest_WrongExtension::RunTest(const FString& Parameters)
 {
 	const FString FilePath = TEXT("path/to/file.png");
@@ -47,7 +43,6 @@ bool FLogoVMCommandTest_WrongExtension::RunTest(const FString& Parameters)
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMCommandTest_CorrectCommand, "LogoVM.Command.CorrectCommand", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
-
 bool FLogoVMCommandTest_CorrectCommand::RunTest(const FString& Parameters)
 {
 	const FString FilePath = TEXT("path/to/file.logo");

@@ -6,13 +6,10 @@
 
 namespace LogoVM
 {
-#pragma region FLogoVMContext
 	static constexpr int32 DefaultCanvasSize = 15; // 15x15 tiles.
-	static constexpr int32 DefaultTurtlePosition = static_cast<int32>(DefaultCanvasSize * 0.5f); // Center of the canvas.
+	static constexpr int32 DefaultTurtlePosition = DefaultCanvasSize / 2; // Center of the canvas.
 	static constexpr int32 DefaultTurtleRotation = 270; // UP (degrees).
 	static constexpr bool bDefaultIsTurtleUp = false;
-
-	static const FLinearColor DefaultTileColor = FLinearColor::White;
 	
 	// Odd resolutions on canvas in order to have a perfect center (not required).
 	FLogoVMContext::FLogoVMContext() : CanvasSize(FIntPoint(DefaultCanvasSize)), TurtlePosition(FIntPoint(DefaultTurtlePosition)), TurtleRotation(DefaultTurtleRotation), bIsTurtleUp(bDefaultIsTurtleUp)
@@ -32,7 +29,7 @@ namespace LogoVM
 		{
 			if (!Commands.Contains(CurrentToken))
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("EXECUTION FAILED: the command \"%s\" is not supported at the time!"), *CurrentToken);
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("EXECUTION FAILED: the command \"%s\" is not supported at the time!"), *CurrentToken);
 				return false;
 			}
 
@@ -53,7 +50,8 @@ namespace LogoVM
 	void FLogoVMContext::InitLogoVM()
 	{
 		const uint32 CanvasResolution = CanvasSize.X * CanvasSize.Y;
-		CanvasTilesColors.Init(DefaultTileColor, CanvasResolution);
+		CanvasTilesColors.Init(Utils::AvailableColors[0 /* WHITE */], CanvasResolution);
+		ActiveColor = Utils::AvailableColors[1 /* BLACK */];
 
 #pragma region Commands
 		Commands.Add(TEXT("fd"), [this](TQueue<FString>& Tokens) -> bool
@@ -63,7 +61,7 @@ namespace LogoVM
 
 			if (!ArgToken.IsNumeric())
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("The forward command argument isn't a number!"));
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"forward\" command argument isn't a number!"));
 				return false;
 			}
 
@@ -78,7 +76,7 @@ namespace LogoVM
 
 			if (Utils::IsOutOfBounds(NewPosition, CanvasSize))
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("The forward command has finished with an out of bounds!"));
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"forward\" command has finished with an out of bounds!"));
 				return false;
 			}
 
@@ -94,7 +92,7 @@ namespace LogoVM
 
 			if (!ArgToken.IsNumeric())
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("The backward command argument isn't a number!"));
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"backward\" command argument isn't a number!"));
 				return false;
 			}
 
@@ -109,7 +107,7 @@ namespace LogoVM
 
 			if (Utils::IsOutOfBounds(NewPosition, CanvasSize))
 			{
-				UE_LOG(LoggerLogoVM, Warning, TEXT("The backward command has finished with an out of bounds!"));
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"backward\" command has finished with an out of bounds!"));
 				return false;
 			}
 
@@ -120,49 +118,66 @@ namespace LogoVM
 		});
 		Commands.Add(TEXT("rt"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			UE_LOG(LogTemp, Warning, TEXT("\"rt\" command"));
+			RUNTIME_LOG(LogTemp, Warning, TEXT("\"rt\" command"));
 
 			return true;
 		});
 		Commands.Add(TEXT("lt"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			UE_LOG(LogTemp, Warning, TEXT("\"lt\" command"));
+			RUNTIME_LOG(LogTemp, Warning, TEXT("\"lt\" command"));
 
 			return true;
 		});
 		Commands.Add(TEXT("ct"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			UE_LOG(LogTemp, Warning, TEXT("\"ct\" command"));
+			RUNTIME_LOG(LogTemp, Warning, TEXT("\"ct\" command"));
 
 			return true;
 		});
 		Commands.Add(TEXT("cs"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			UE_LOG(LogTemp, Warning, TEXT("\"cs\" command"));
+			RUNTIME_LOG(LogTemp, Warning, TEXT("\"cs\" command"));
 
 			return true;
 		});
 		Commands.Add(TEXT("pu"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			UE_LOG(LogTemp, Warning, TEXT("\"pu\" command"));
+			RUNTIME_LOG(LogTemp, Warning, TEXT("\"pu\" command"));
 
 			return true;
 		});
 		Commands.Add(TEXT("pd"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			UE_LOG(LogTemp, Warning, TEXT("\"pd\" command"));
+			RUNTIME_LOG(LogTemp, Warning, TEXT("\"pd\" command"));
 
 			return true;
 		});
 		Commands.Add(TEXT("pc"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			UE_LOG(LogTemp, Warning, TEXT("\"pc\" command"));
+			FString ArgToken;
+			Tokens.Dequeue(ArgToken);
 
+			if (!ArgToken.IsNumeric())
+			{
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"pen color\" command argument isn't a number!"));
+				return false;
+			}
+
+			const int32 Arg = FCString::Atoi(*ArgToken);
+
+			if (Arg < 0 || Arg >= Utils::AvailableColors.Num())
+			{
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"pen color\" command argument isn't valid!"));
+				return false;
+			}
+
+			ActiveColor = Utils::AvailableColors[Arg];
+			
 			return true;
 		});
 		Commands.Add(TEXT("ps"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			UE_LOG(LogTemp, Warning, TEXT("\"ps\" command"));
+			RUNTIME_LOG(LogTemp, Warning, TEXT("\"ps\" command"));
 
 			return true;
 		});
@@ -176,7 +191,7 @@ namespace LogoVM
 
 		return FVector2D(CosRotationVector, SinRotationVector);
 	}
-
+	
 	const TArray<FLinearColor>& FLogoVMContext::GetCanvasTilesColors() const
 	{
 		return CanvasTilesColors;
@@ -199,7 +214,7 @@ namespace LogoVM
 
 		// Coloring on the pre-movement position.
 		CurrentIndex = (OldTurtlePosition.X + Steps.X) + ((OldTurtlePosition.Y + Steps.Y) * CanvasSize.X);
-		CanvasTilesColors[CurrentIndex] = FLinearColor::Black;
+		CanvasTilesColors[CurrentIndex] = ActiveColor;
 
 		while (Steps.X != TurtleTraslation.X || Steps.Y != TurtleTraslation.Y)
 		{
@@ -215,8 +230,7 @@ namespace LogoVM
 			
 			// Coloring.
 			CurrentIndex = (OldTurtlePosition.X + Steps.X) + ((OldTurtlePosition.Y + Steps.Y) * CanvasSize.X);
-			CanvasTilesColors[CurrentIndex] = FLinearColor::Black;
+			CanvasTilesColors[CurrentIndex] = ActiveColor;
 		}
 	}
-#pragma endregion // FLogoVMContext
 }

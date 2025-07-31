@@ -47,7 +47,7 @@ namespace LogoVM
 		FString FileContent;
 		if (!FFileHelper::LoadFileToString(FileContent, *FilePath))
 		{
-			UE_LOG(LoggerLogoVM, Error, TEXT("Loading of \"%s\"'s content is failed!"), *FilePath);
+			RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The loading of \"%s\"'s content is failed!"), *FilePath);
 			return false;
 		}
 
@@ -82,13 +82,13 @@ namespace LogoVM
 			
 			if (!CanvasTiles[Index]->CallFunctionByNameWithArguments(*InitFunction, OutputDeviceNull, nullptr, true))
 			{
-				UE_LOG(LoggerLogoVM, Error, TEXT("Unable to call the \"Init\" function in BP_Cube!"));
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to call the \"Init\" function in BP_Cube!"));
 				return false;
 			}
 			
 			if (!CanvasTiles[Index]->CallFunctionByNameWithArguments(*SetColorFunction, OutputDeviceNull, nullptr, true))
 			{
-				UE_LOG(LoggerLogoVM, Error, TEXT("Unable to call the \"SetColor\" function in BP_Cube!"));
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to call the \"SetColor\" function in BP_Cube!"));
 				return false;
 			}
 		}
