@@ -4,7 +4,6 @@
 #include "LogoVM.h"
 #include "LogoVMUtils.h"
 #include "LogoVMContext.h"
-#include "IContentBrowserSingleton.h"
 #include "Misc/OutputDeviceNull.h"
 
 #define LOCTEXT_NAMESPACE "FLogoVMModule"
@@ -24,7 +23,7 @@ namespace LogoVM
 		// we call this function before unloading the module.
 	}
 
-	bool FLogoVMModule::Exec(UWorld* InWorld, const TCHAR* Cmd /* Command's stream */, FOutputDevice& Ar /* Console */)
+	bool FLogoVMModule::Exec(UWorld* InWorld, const TCHAR* Cmd /* Commands stream */, FOutputDevice& Ar /* Console */)
 	{
 		if (!InWorld)
 		{
@@ -53,8 +52,9 @@ namespace LogoVM
 
 		TQueue<FString>	Tokens;
 		Utils::Tokenize(Tokens, FileContent);
-	
-		FLogoVMContext LogoVMContext;
+
+		// LOGO Virtual Machine.
+		FLogoVMContext LogoVMContext = { FIntPoint(15, 15), FIntPoint(7, 7), 270, false, 0 };
 
 		TArray<AActor*> CanvasTiles;
 		if (!Utils::TrySpawnCanvas(CanvasTiles, InWorld, LogoVMContext.GetCanvasSize()))

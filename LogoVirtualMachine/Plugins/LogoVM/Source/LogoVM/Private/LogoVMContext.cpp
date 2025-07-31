@@ -6,18 +6,29 @@
 
 namespace LogoVM
 {
-	static constexpr int32 DefaultCanvasSize = 15; // 15x15 tiles.
+	static constexpr int32 DefaultCanvasSize = 15; // 15x15.
 	static constexpr int32 DefaultTurtlePosition = DefaultCanvasSize / 2; // Center of the canvas.
 	static constexpr int32 DefaultTurtleRotation = 270; // UP (degrees).
 	static constexpr bool bDefaultIsTurtleUp = false;
 	
-	// Odd resolutions on canvas in order to have a perfect center (not required).
-	FLogoVMContext::FLogoVMContext() : CanvasSize(FIntPoint(DefaultCanvasSize)), TurtlePosition(FIntPoint(DefaultTurtlePosition)), TurtleRotation(DefaultTurtleRotation), bIsTurtleUp(bDefaultIsTurtleUp)
+	FLogoVMContext::FLogoVMContext() : CanvasSize(FIntPoint(DefaultCanvasSize)),
+		                               TurtlePosition(FIntPoint(DefaultTurtlePosition)),
+		                               TurtleRotation(DefaultTurtleRotation),
+	                                   bIsTurtleUp(bDefaultIsTurtleUp),
+		                               DefaultBackgroundColor(Utils::AvailableColors[0 /* WHITE */])
 	{
 		InitLogoVM();
 	}
 
-	FLogoVMContext::FLogoVMContext(const FIntPoint InCanvasSize, const FIntPoint InTurtlePosition, const int32 InTurtleRotation, const bool bInIsTurtleUp) : CanvasSize(InCanvasSize), TurtlePosition(InTurtlePosition), TurtleRotation(InTurtleRotation), bIsTurtleUp(bInIsTurtleUp)
+	FLogoVMContext::FLogoVMContext(const FIntPoint InCanvasSize,
+	                               const FIntPoint InTurtlePosition,
+	                               const int32 InTurtleRotation,
+	                               const bool bInIsTurtleUp,
+	                               const int32 InDefaultBackgroundColor) :
+	                               CanvasSize(InCanvasSize),
+	                               TurtlePosition(InTurtlePosition),
+	                               TurtleRotation(InTurtleRotation), bIsTurtleUp(bInIsTurtleUp),
+	                               DefaultBackgroundColor(IsColorAvailableByIndex(InDefaultBackgroundColor) ? Utils::AvailableColors[InDefaultBackgroundColor]: Utils::AvailableColors[0 /* WHITE */])
 	{
 		InitLogoVM();
 	}
@@ -50,7 +61,7 @@ namespace LogoVM
 	void FLogoVMContext::InitLogoVM()
 	{
 		const uint32 CanvasResolution = CanvasSize.X * CanvasSize.Y;
-		CanvasTilesColors.Init(Utils::AvailableColors[0 /* WHITE */], CanvasResolution);
+		CanvasTilesColors.Init(DefaultBackgroundColor, CanvasResolution);
 		ActiveColor = Utils::AvailableColors[1 /* BLACK */];
 
 #pragma region Commands
@@ -136,19 +147,22 @@ namespace LogoVM
 		});
 		Commands.Add(TEXT("cs"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			RUNTIME_LOG(LogTemp, Warning, TEXT("\"cs\" command"));
+			for (FLinearColor& TileColor : CanvasTilesColors)
+			{
+				TileColor = DefaultBackgroundColor;
+			}
 
 			return true;
 		});
 		Commands.Add(TEXT("pu"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			RUNTIME_LOG(LogTemp, Warning, TEXT("\"pu\" command"));
+			bIsTurtleUp = true;
 
 			return true;
 		});
 		Commands.Add(TEXT("pd"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			RUNTIME_LOG(LogTemp, Warning, TEXT("\"pd\" command"));
+			bIsTurtleUp = false;
 
 			return true;
 		});
@@ -165,7 +179,7 @@ namespace LogoVM
 
 			const int32 Arg = FCString::Atoi(*ArgToken);
 
-			if (Arg < 0 || Arg >= Utils::AvailableColors.Num())
+			if (!IsColorAvailableByIndex(Arg))
 			{
 				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"pen color\" command argument isn't valid!"));
 				return false;
@@ -197,10 +211,22 @@ namespace LogoVM
 		return CanvasTilesColors;
 	}
 
+#if WITH_DEV_AUTOMATION_TESTS
 	FIntPoint FLogoVMContext::GetTurtlePosition() const
 	{
 		return TurtlePosition;
 	}
+
+	bool FLogoVMContext::GetIsTurtleUp() const
+	{
+		return bIsTurtleUp;
+	}
+
+	FLinearColor FLogoVMContext::GetDefaultBackgroundColor() const
+	{
+		return DefaultBackgroundColor;
+	}
+#endif
 
 	void FLogoVMContext::Move(const FIntPoint OldTurtlePosition, const FIntPoint TurtleTraslation)
 	{
@@ -232,5 +258,10 @@ namespace LogoVM
 			CurrentIndex = (OldTurtlePosition.X + Steps.X) + ((OldTurtlePosition.Y + Steps.Y) * CanvasSize.X);
 			CanvasTilesColors[CurrentIndex] = ActiveColor;
 		}
+	}
+
+	bool FLogoVMContext::IsColorAvailableByIndex(const int32 Index) const
+	{
+		return Index >= 0 && Index < Utils::AvailableColors.Num();
 	}
 }

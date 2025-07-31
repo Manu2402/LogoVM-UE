@@ -13,7 +13,7 @@ namespace LogoVM
 		
 	public:
 		FLogoVMContext();
-		FLogoVMContext(const FIntPoint InCanvasSize, const FIntPoint InTurtlePosition, const int32 InTurtleRotation, const bool bInIsTurtleUp);
+		FLogoVMContext(const FIntPoint InCanvasSize, const FIntPoint InTurtlePosition, const int32 InTurtleRotation, const bool bInIsTurtleUp, const int32 InDefaultBackgroundColor);
 		
 		~FLogoVMContext() = default;
 		
@@ -27,12 +27,17 @@ namespace LogoVM
 		FIntPoint GetCanvasSize() const;
 		const TArray<FLinearColor>& GetCanvasTilesColors() const;
 
+#if WITH_DEV_AUTOMATION_TESTS
+		FLinearColor GetDefaultBackgroundColor() const;
 		FIntPoint GetTurtlePosition() const;
+		bool GetIsTurtleUp() const;
+#endif
 		
 	private:
 		FIntPoint CanvasSize;
 		TMap<FString, FCommand> Commands;
 		TArray<FLinearColor> CanvasTilesColors;
+		const FLinearColor DefaultBackgroundColor;
 		FLinearColor ActiveColor;
 		FIntPoint TurtlePosition;
 		double TurtleRotation; // Rotations are represented inversely, using clock-wise direction.
@@ -40,8 +45,10 @@ namespace LogoVM
 
 	private:
 		void InitLogoVM();
-		FVector2D GetTurtleRotationVector() const;
 		void Move(const FIntPoint OldTurtlePosition, const FIntPoint TurtleTraslation);
+		
+		FVector2D GetTurtleRotationVector() const;
+		bool IsColorAvailableByIndex(const int32 Index) const;
 
 	};
 }
