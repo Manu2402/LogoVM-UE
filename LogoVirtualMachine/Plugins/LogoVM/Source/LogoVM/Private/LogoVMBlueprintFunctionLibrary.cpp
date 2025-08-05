@@ -8,22 +8,6 @@
 
 bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(UObject* WorldContextObject, const FString& Cmd)
 {
-	if (!WorldContextObject)
-	{
-		return false;
-	}
-
-	if (!GEngine)
-	{
-		return false;
-	}
-	
-	UWorld* World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
-	if (!World)
-	{
-		return false;
-	}
-
 	const TCHAR* CmdChars = Cmd.GetCharArray().GetData();
 
 	// The command must start with the "logo" word!
@@ -46,8 +30,29 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(UObject* WorldContex
 		return false;
 	}
 
+	return LogoVMExecuteFromContent(WorldContextObject, FileContent);
+}
+
+bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldContextObject, const FString& Content)
+{
+	if (!WorldContextObject)
+	{
+		return false;
+	}
+
+	if (!GEngine)
+	{
+		return false;
+	}
+	
+	UWorld* World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
+	if (!World)
+	{
+		return false;
+	}
+	
 	TQueue<FString> Tokens;
-	LogoVM::Utils::Tokenize(Tokens, FileContent);
+	LogoVM::Utils::Tokenize(Tokens, Content);
 
 	// LOGO Virtual Machine.
 	LogoVM::FLogoVMContext LogoVMContext = { FIntPoint(50, 50), FIntPoint(25, 25), 270, false, 0 };
