@@ -7,6 +7,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LoggerLogoVM, Log, All);
 
+// Macro to avoid "runtime error logs" when automation tests are being performed.
 #define RUNTIME_LOG(CategoryName, Verbosity, FormatString, ...)         \
 	if (!GIsAutomationTesting)                                          \
 	{                                                                   \
