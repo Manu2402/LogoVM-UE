@@ -27,7 +27,9 @@ namespace LogoVM
 	                               const int32 InDefaultBackgroundColor) :
 	                               CanvasSize(InCanvasSize),
 	                               TurtlePosition(InTurtlePosition),
-	                               TurtleRotation(InTurtleRotation), bIsTurtleUp(bInIsTurtleUp),
+								   // Recommended rotations (degrees): 0, 45, 90, 135, 180, 225, 270, 315, 360 
+	                               TurtleRotation(InTurtleRotation),
+								   bIsTurtleUp(bInIsTurtleUp),
 	                               DefaultBackgroundColor(IsColorAvailableByIndex(InDefaultBackgroundColor) ? Utils::AvailableColors[InDefaultBackgroundColor]: Utils::AvailableColors[0 /* WHITE */])
 	{
 		InitLogoVM();
@@ -129,20 +131,40 @@ namespace LogoVM
 		});
 		Commands.Add(TEXT("rt"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			RUNTIME_LOG(LogTemp, Warning, TEXT("\"rt\" command"));
+			FString ArgToken;
+			Tokens.Dequeue(ArgToken);
 
+			if (!ArgToken.IsNumeric())
+			{
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"right turn\" command argument isn't a number!"));
+				return false;
+			}
+
+			const int32 Arg = FCString::Atoi(*ArgToken);
+			TurtleRotation += Arg;
+			
 			return true;
 		});
 		Commands.Add(TEXT("lt"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			RUNTIME_LOG(LogTemp, Warning, TEXT("\"lt\" command"));
+			FString ArgToken;
+			Tokens.Dequeue(ArgToken);
+
+			if (!ArgToken.IsNumeric())
+			{
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"left turn\" command argument isn't a number!"));
+				return false;
+			}
+
+			const int32 Arg = FCString::Atoi(*ArgToken);
+			TurtleRotation -= Arg;
 
 			return true;
 		});
 		Commands.Add(TEXT("ct"), [this](TQueue<FString>& Tokens) -> bool
 		{
-			RUNTIME_LOG(LogTemp, Warning, TEXT("\"ct\" command"));
-
+			TurtlePosition = CanvasSize / 2;
+			
 			return true;
 		});
 		Commands.Add(TEXT("cs"), [this](TQueue<FString>& Tokens) -> bool
@@ -189,12 +211,6 @@ namespace LogoVM
 			
 			return true;
 		});
-		Commands.Add(TEXT("ps"), [this](TQueue<FString>& Tokens) -> bool
-		{
-			RUNTIME_LOG(LogTemp, Warning, TEXT("\"ps\" command"));
-
-			return true;
-		});
 #pragma endregion // Commands
 	}
 
@@ -215,6 +231,11 @@ namespace LogoVM
 	FIntPoint FLogoVMContext::GetTurtlePosition() const
 	{
 		return TurtlePosition;
+	}
+
+	int32 FLogoVMContext::GetTurtleRotation() const
+	{
+		return TurtleRotation;
 	}
 
 	bool FLogoVMContext::GetIsTurtleUp() const

@@ -30,6 +30,7 @@ namespace LogoVM
 #if WITH_DEV_AUTOMATION_TESTS
 		FLinearColor GetDefaultBackgroundColor() const;
 		FIntPoint GetTurtlePosition() const;
+		int32 GetTurtleRotation() const;
 		bool GetIsTurtleUp() const;
 #endif
 		
@@ -40,7 +41,7 @@ namespace LogoVM
 		const FLinearColor DefaultBackgroundColor;
 		FLinearColor ActiveColor;
 		FIntPoint TurtlePosition;
-		double TurtleRotation; // Rotations are represented inversely, using clock-wise direction.
+		int32 TurtleRotation; // Rotations are represented inversely, using clock-wise direction.
 		bool bIsTurtleUp;
 
 	private:

@@ -54,7 +54,8 @@ namespace LogoVM
 		Utils::Tokenize(Tokens, FileContent);
 
 		// LOGO Virtual Machine.
-		FLogoVMContext LogoVMContext = { FIntPoint(15, 15), FIntPoint(7, 7), 270, false, 0 };
+		// FLogoVMContext LogoVMContext = { FIntPoint(15, 15), FIntPoint(7, 7), 270, false, 0 };
+		FLogoVMContext LogoVMContext = { FIntPoint(50, 50), FIntPoint(25, 25), 270, false, 0 };
 
 		TArray<AActor*> CanvasTiles;
 		if (!Utils::TrySpawnCanvas(CanvasTiles, InWorld, LogoVMContext.GetCanvasSize()))

@@ -363,6 +363,103 @@ bool FLogoVMExecutorTest_BackwardDownRight::RunTest(const FString& Parameters)
 
 #pragma endregion // Backward
 
+#pragma region RightTurn
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_RightTurnStringArg, "LogoVM.Executor.RightTurn.StringArg", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_RightTurnStringArg::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM = { FIntPoint(15, 15), FIntPoint(7, 7), 90, false, 1 };
+
+	const FString LogoContent = TEXT("rt angle");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	const bool bExecutionResult = LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The \"right turn\" command should take just a numeric value as an argument!"), bExecutionResult, false);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_RightTurn, "LogoVM.Executor.RightTurn", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_RightTurn::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM = { FIntPoint(15, 15), FIntPoint(7, 7), 270 /* UP */, false, 1 };
+
+	const FString LogoContent = TEXT("rt 90");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The turtle's rotation is not what it should be!"), LogoVM.GetTurtleRotation(), 360);
+
+	return true;
+}
+
+#pragma endregion // RightTurn
+
+#pragma region LeftTurn
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_LeftTurnStringArg, "LogoVM.Executor.LeftTurn.StringArg", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_LeftTurnStringArg::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM = { FIntPoint(15, 15), FIntPoint(7, 7), 90, false, 1 };
+
+	const FString LogoContent = TEXT("lt angle");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	const bool bExecutionResult = LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The \"left turn\" command should take just a numeric value as an argument!"), bExecutionResult, false);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_LeftTurn, "LogoVM.Executor.LeftTurn", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_LeftTurn::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM = { FIntPoint(15, 15), FIntPoint(7, 7), 270 /* UP */, false, 1 };
+
+	const FString LogoContent = TEXT("lt 90");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The turtle's rotation is not what it should be!"), LogoVM.GetTurtleRotation(), 180);
+
+	return true;
+}
+
+#pragma endregion // LeftTurn
+
+#pragma region CenterTurtle
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_CenterTurtle, "LogoVM.Executor.CenterTurtle", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_CenterTurtle::RunTest(const FString& Parameters)
+{
+	const FIntPoint CanvasSize = { 15, 15 };
+	
+	LogoVM::FLogoVMContext LogoVM = { CanvasSize, FIntPoint(1, 1), 270 /* UP */, false, 1 };
+
+	const FString LogoContent = TEXT("ct");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	LogoVM.Execute(Tokens);
+
+	const FIntPoint CanvasCenter = CanvasSize / 2;
+
+	TestEqual(TEXT("The turtle's position on X axis is not what it should be!"), LogoVM.GetTurtlePosition().X, CanvasCenter.X);
+	TestEqual(TEXT("The turtle's position on Y axis is not what it should be!"), LogoVM.GetTurtlePosition().Y, CanvasCenter.Y);
+
+	return true;
+}
+
+#pragma endregion // CenterTurtle
+
 #pragma region ClearScreen
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_ClearScreen, "LogoVM.Executor.ClearScreen", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
