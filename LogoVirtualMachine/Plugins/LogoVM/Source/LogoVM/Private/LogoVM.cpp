@@ -23,7 +23,12 @@ namespace LogoVM
 
 	bool FLogoVMModule::Exec(UWorld* InWorld, const TCHAR* Cmd /* Commands stream */, FOutputDevice& Ar /* Console */)
 	{
-		return ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(InWorld, Cmd);
+		// (50x50)
+		const int32 CanvasSizeX = 50;
+		const int32 CanvasSizeY = 50;
+		
+		TArray<FLinearColor> CanvasTilesColors;
+		return ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(InWorld, Cmd, CanvasSizeX, CanvasSizeY, CanvasTilesColors);
 	}
 }
 

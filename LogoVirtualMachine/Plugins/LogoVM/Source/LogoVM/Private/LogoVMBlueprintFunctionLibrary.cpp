@@ -6,12 +6,12 @@
 #include "LogoVM.h"
 #include "Misc/OutputDeviceNull.h"
 
-bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(UObject* WorldContextObject, const FString& Cmd)
+bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(UObject* WorldContextObject, const FString& Cmd, const int32 CanvasSizeX, const int32 CanvasSizeY, TArray<FLinearColor>& InCanvasTilesColors)
 {
 	const TCHAR* CmdChars = Cmd.GetCharArray().GetData();
 
 	// The command must start with the "logo" word!
-	if (!FParse::Command(&CmdChars, TEXT("Logo")))
+	if (!FParse::Command(&CmdChars, TEXT("logo")))
 	{
 		return false;
 	}
@@ -30,37 +30,38 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(UObject* WorldContex
 		return false;
 	}
 
-	return LogoVMExecuteFromContent(WorldContextObject, FileContent);
+	return LogoVMExecuteFromContent(WorldContextObject, FileContent, CanvasSizeX, CanvasSizeY, InCanvasTilesColors);
 }
 
-bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldContextObject, const FString& Content)
+bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldContextObject, const FString& Content, const int32 CanvasSizeX, const int32 CanvasSizeY, TArray<FLinearColor>& InCanvasTilesColors)
 {
-	if (!WorldContextObject)
+	UWorld* World = nullptr;
+	if (WorldContextObject)
 	{
-		return false;
-	}
-
-	if (!GEngine)
-	{
-		return false;
-	}
-	
-	UWorld* World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
-	if (!World)
-	{
-		return false;
+		if (GEngine)
+		{
+			World = GEngine->GetWorldFromContextObjectChecked(WorldContextObject);
+		}
+		else
+		{
+			RUNTIME_LOG(LoggerLogoVM, Warning, TEXT("Unable to create the canvas: not all resources are valid! (GEngine)"));
+		}
 	}
 	
 	TQueue<FString> Tokens;
 	LogoVM::Utils::Tokenize(Tokens, Content);
 
 	// LOGO Virtual Machine.
-	LogoVM::FLogoVMContext LogoVMContext = { FIntPoint(50, 50), FIntPoint(25, 25), 270, false, 0 };
+	LogoVM::FLogoVMContext LogoVMContext = { FIntPoint(CanvasSizeX, CanvasSizeY), FIntPoint(CanvasSizeX / 2, CanvasSizeY / 2), 270, false, 0 };
 
 	TArray<AActor*> CanvasTiles;
-	if (!LogoVM::Utils::TrySpawnCanvas(CanvasTiles, World, LogoVMContext.GetCanvasSize()))
+	if (World)
 	{
-		return false;
+		LogoVM::Utils::TrySpawnCanvas(CanvasTiles, World, LogoVMContext.GetCanvasSize());
+	}
+	else
+	{
+		RUNTIME_LOG(LoggerLogoVM, Warning, TEXT("Unable to create the canvas: not all resources are valid! (World)"));
 	}
 
 	if (!LogoVMContext.Execute(Tokens))
@@ -68,7 +69,7 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldCon
 		return false;
 	}
 
-	const TArray<FLinearColor>& CanvasTilesColors = LogoVMContext.GetCanvasTilesColors();
+	InCanvasTilesColors = LogoVMContext.GetCanvasTilesColors();
 
 	for (int32 Index = 0; Index < CanvasTiles.Num(); Index++)
 	{
@@ -77,7 +78,7 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldCon
 
 		// In order to call "SetColor { R, G, B, A }", found in "BP_Cube".
 		// "CanvasTiles" and "CanvasTilesColors" has same size at this point! So, i avoid overengineering.
-		const FString SetColorFunction = FString::Printf(TEXT("SetColor %s"), *(CanvasTilesColors[Index].ToString()));
+		const FString SetColorFunction = FString::Printf(TEXT("SetColor %s"), *(InCanvasTilesColors[Index].ToString()));
 
 		FOutputDeviceNull OutputDeviceNull;
 

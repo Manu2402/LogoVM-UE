@@ -61,7 +61,7 @@ namespace LogoVM
 
 			if (!CubeClass)
 			{
-				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when loading tile's body!"));
+				RUNTIME_LOG(LoggerLogoVM, Warning, TEXT("Unable to create the canvas: error when loading tile's body!"));
 				return false;
 			}
 
@@ -84,7 +84,7 @@ namespace LogoVM
 					AActor* CanvasTile = InWorld->SpawnActor<AActor>(CubeClass, FVector::ZeroVector, Rotation, SpawnParameters);
 					if (!CanvasTile)
 					{
-						RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when spawning a tile!"));
+						RUNTIME_LOG(LoggerLogoVM, Warning, TEXT("Unable to create the canvas: error when spawning a tile!"));
 						return false;
 					}
 
@@ -93,7 +93,7 @@ namespace LogoVM
 						UStaticMeshComponent* StaticMeshComponent = CanvasTile->FindComponentByClass<UStaticMeshComponent>();
 						if (!StaticMeshComponent)
 						{
-							RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: error when spawning a tile's body!"));
+							RUNTIME_LOG(LoggerLogoVM, Warning, TEXT("Unable to create the canvas: error when spawning a tile's body!"));
 							return false;
 						}
 
