@@ -6,7 +6,7 @@
 
 namespace LogoVM
 {
-	static constexpr int32 DefaultCanvasSize = 15; // 15x15.
+	static constexpr int32 DefaultCanvasSize = 50; // (50x50).
 	static constexpr int32 DefaultTurtlePosition = DefaultCanvasSize / 2; // Center of the canvas.
 	static constexpr int32 DefaultTurtleRotation = 270; // UP (degrees).
 	static constexpr bool bDefaultIsTurtleUp = false;
@@ -15,7 +15,7 @@ namespace LogoVM
 		                               TurtlePosition(FIntPoint(DefaultTurtlePosition)),
 		                               TurtleRotation(DefaultTurtleRotation),
 	                                   bIsTurtleUp(bDefaultIsTurtleUp),
-		                               DefaultBackgroundColor(Utils::AvailableColors[0 /* WHITE */])
+		                               DefaultBackgroundColor(Utils::AvailableColors[0])
 	{
 		InitLogoVM();
 	}
@@ -30,7 +30,7 @@ namespace LogoVM
 								   // Recommended rotations (degrees): 0, 45, 90, 135, 180, 225, 270, 315, 360 
 	                               TurtleRotation(InTurtleRotation),
 								   bIsTurtleUp(bInIsTurtleUp),
-	                               DefaultBackgroundColor(IsColorAvailableByIndex(InDefaultBackgroundColor) ? Utils::AvailableColors[InDefaultBackgroundColor]: Utils::AvailableColors[0 /* WHITE */])
+	                               DefaultBackgroundColor(Utils::AvailableColors.IsValidIndex(InDefaultBackgroundColor) ? Utils::AvailableColors[InDefaultBackgroundColor]: Utils::AvailableColors[0])
 	{
 		InitLogoVM();
 	}
@@ -64,7 +64,7 @@ namespace LogoVM
 	{
 		const uint32 CanvasResolution = CanvasSize.X * CanvasSize.Y;
 		CanvasTilesColors.Init(DefaultBackgroundColor, CanvasResolution);
-		ActiveColor = Utils::AvailableColors[1 /* BLACK */];
+		ActiveColor = Utils::AvailableColors[1];
 
 #pragma region Commands
 		Commands.Add(TEXT("fd"), [this](TQueue<FString>& Tokens) -> bool
@@ -201,7 +201,7 @@ namespace LogoVM
 
 			const int32 Arg = FCString::Atoi(*ArgToken);
 
-			if (!IsColorAvailableByIndex(Arg))
+			if (!Utils::AvailableColors.IsValidIndex(Arg))
 			{
 				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"pen color\" command argument isn't valid!"));
 				return false;
@@ -279,10 +279,5 @@ namespace LogoVM
 			CurrentIndex = (OldTurtlePosition.X + Steps.X) + ((OldTurtlePosition.Y + Steps.Y) * CanvasSize.X);
 			CanvasTilesColors[CurrentIndex] = ActiveColor;
 		}
-	}
-
-	bool FLogoVMContext::IsColorAvailableByIndex(const int32 Index) const
-	{
-		return Index >= 0 && Index < Utils::AvailableColors.Num();
 	}
 }

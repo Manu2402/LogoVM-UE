@@ -49,7 +49,6 @@ namespace LogoVM
 		void Move(const FIntPoint OldTurtlePosition, const FIntPoint TurtleTraslation);
 		
 		FVector2D GetTurtleRotationVector() const;
-		bool IsColorAvailableByIndex(const int32 Index) const;
-
+		
 	};
 }

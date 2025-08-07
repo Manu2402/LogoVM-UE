@@ -3,6 +3,7 @@
 
 #include "LogoVM.h"
 #include "LogoVMBlueprintFunctionLibrary.h"
+#include "Assets/CanvasDataAsset.h"
 
 #define LOCTEXT_NAMESPACE "FLogoVMModule"
 
@@ -23,12 +24,15 @@ namespace LogoVM
 
 	bool FLogoVMModule::Exec(UWorld* InWorld, const TCHAR* Cmd /* Commands stream */, FOutputDevice& Ar /* Console */)
 	{
-		// (50x50)
-		const int32 CanvasSizeX = 50;
-		const int32 CanvasSizeY = 50;
+		UCanvasDataAsset* CanvasDataAsset = Cast<UCanvasDataAsset>(StaticLoadObject(UCanvasDataAsset::StaticClass(), nullptr, TEXT("/LogoVM/Assets/CanvasDataAsset.CanvasDataAsset")));
+		if (!CanvasDataAsset)
+		{
+			RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to load the canvas data asset!"));
+			return false;
+		}
 		
 		TArray<FLinearColor> CanvasTilesColors;
-		return ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(InWorld, Cmd, CanvasSizeX, CanvasSizeY, CanvasTilesColors);
+		return ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(InWorld, Cmd, CanvasDataAsset->CanvasWidth, CanvasDataAsset->CanvasHeight, CanvasTilesColors);
 	}
 }
 

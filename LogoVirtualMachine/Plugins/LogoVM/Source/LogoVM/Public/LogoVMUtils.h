@@ -11,15 +11,15 @@ namespace LogoVM
 		// For avoid re-definition in another classes that imports this ".h". 
 		inline const TArray<FLinearColor> AvailableColors = 
 		{
-			FLinearColor::White,
-			FLinearColor::Black,
-			FLinearColor::Red,
-			FLinearColor::Green,
-			FLinearColor::Blue,
-			FLinearColor::Yellow,
-			FLinearColor(0.f, 1.f, 1.f), // Cyan
-			FLinearColor(0.35f, 0.13f, 0.55f), // Magenta
-			FLinearColor(1.f, 0.65f, 0.f) // Orange
+			/* 0 */ FLinearColor::White,                              
+			/* 1 */ FLinearColor::Black,
+			/* 2 */ FLinearColor::Red,
+			/* 3 */ FLinearColor::Green,
+			/* 4 */ FLinearColor::Blue,
+			/* 5 */ FLinearColor::Yellow,
+			/* 6 */ FLinearColor(0.f, 1.f, 1.f),       // Cyan
+			/* 7 */ FLinearColor(0.35f, 0.13f, 0.55f), // Magenta
+			/* 8 */ FLinearColor(1.f, 0.65f, 0.f)      // Orange
 
 			// You can expand the set of available colors!
 		};

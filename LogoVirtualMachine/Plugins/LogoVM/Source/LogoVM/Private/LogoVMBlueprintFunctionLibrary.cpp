@@ -4,9 +4,10 @@
 #include "LogoVMContext.h"
 #include "LogoVMUtils.h"
 #include "LogoVM.h"
+#include "Assets/CanvasDataAsset.h"
 #include "Misc/OutputDeviceNull.h"
 
-bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(UObject* WorldContextObject, const FString& Cmd, const int32 CanvasSizeX, const int32 CanvasSizeY, TArray<FLinearColor>& InCanvasTilesColors)
+bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(UObject* WorldContextObject, const FString& Cmd, const int32 CanvasWidth, const int32 CanvasHeight, TArray<FLinearColor>& CanvasTilesColors)
 {
 	const TCHAR* CmdChars = Cmd.GetCharArray().GetData();
 
@@ -30,11 +31,17 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(UObject* WorldContex
 		return false;
 	}
 
-	return LogoVMExecuteFromContent(WorldContextObject, FileContent, CanvasSizeX, CanvasSizeY, InCanvasTilesColors);
+	return LogoVMExecuteFromContent(WorldContextObject, FileContent, CanvasWidth, CanvasHeight, CanvasTilesColors);
 }
 
-bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldContextObject, const FString& Content, const int32 CanvasSizeX, const int32 CanvasSizeY, TArray<FLinearColor>& InCanvasTilesColors)
+bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldContextObject, const FString& Content, const int32 CanvasWidth, const int32 CanvasHeight, TArray<FLinearColor>& CanvasTilesColors)
 {
+	if (CanvasWidth <= 0 || CanvasHeight <= 0)
+	{
+		RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Invalid canvas resolution!"));
+		return false;
+	}
+	
 	UWorld* World = nullptr;
 	if (WorldContextObject)
 	{
@@ -52,7 +59,7 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldCon
 	LogoVM::Utils::Tokenize(Tokens, Content);
 
 	// LOGO Virtual Machine.
-	LogoVM::FLogoVMContext LogoVMContext = { FIntPoint(CanvasSizeX, CanvasSizeY), FIntPoint(CanvasSizeX / 2, CanvasSizeY / 2), 270, false, 0 };
+	LogoVM::FLogoVMContext LogoVMContext = { FIntPoint(CanvasWidth, CanvasHeight), FIntPoint(CanvasWidth / 2, CanvasHeight / 2), 270, false, 0 };
 
 	TArray<AActor*> CanvasTiles;
 	if (World)
@@ -69,7 +76,7 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldCon
 		return false;
 	}
 
-	InCanvasTilesColors = LogoVMContext.GetCanvasTilesColors();
+	CanvasTilesColors = LogoVMContext.GetCanvasTilesColors();
 
 	for (int32 Index = 0; Index < CanvasTiles.Num(); Index++)
 	{
@@ -78,7 +85,7 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldCon
 
 		// In order to call "SetColor { R, G, B, A }", found in "BP_Cube".
 		// "CanvasTiles" and "CanvasTilesColors" has same size at this point! So, i avoid overengineering.
-		const FString SetColorFunction = FString::Printf(TEXT("SetColor %s"), *(InCanvasTilesColors[Index].ToString()));
+		const FString SetColorFunction = FString::Printf(TEXT("SetColor %s"), *(CanvasTilesColors[Index].ToString()));
 
 		FOutputDeviceNull OutputDeviceNull;
 

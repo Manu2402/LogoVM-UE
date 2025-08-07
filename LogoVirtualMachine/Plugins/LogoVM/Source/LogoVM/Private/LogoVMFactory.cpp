@@ -2,6 +2,8 @@
 
 #include "LogoVMFactory.h"
 #include "LogoVMBlueprintFunctionLibrary.h"
+#include "Assets/CanvasDataAsset.h"
+#include "Assets/TextureDataAsset.h"
 #include "ImageUtils.h"
 #include "LogoVM.h"
 
@@ -15,59 +17,72 @@ ULogoVMFactory::ULogoVMFactory()
 
 UObject* ULogoVMFactory::FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled)
 {
-	// (60x60)
-	const int32 CanvasSizeX = 60;
-	const int32 CanvasSizeY = 60;
+	UCanvasDataAsset* CanvasDataAsset = Cast<UCanvasDataAsset>(StaticLoadObject(UCanvasDataAsset::StaticClass(), nullptr, TEXT("/LogoVM/Assets/CanvasDataAsset.CanvasDataAsset")));
+	if (!CanvasDataAsset)
+	{
+		RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to load the canvas data asset!"));
+		return nullptr;
+	}
 
 	const FString Cmd = TEXT("logo ") + Filename;
 	TArray<FLinearColor> CanvasTilesColors;
-	if (!ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(nullptr, Cmd, CanvasSizeX, CanvasSizeY, CanvasTilesColors))
+	if (!ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(nullptr, Cmd, CanvasDataAsset->CanvasWidth, CanvasDataAsset->CanvasHeight, CanvasTilesColors))
 	{
 		UE_LOG(LoggerLogoVM, Error, TEXT("Unable to generate the texture: something is failed during the execution!"))
 		return nullptr;
 	}
 
-	TArray<FColor> OutPixels;
-	const int32 PixelSize = 15; // (15x15 pixels).
+	UTextureDataAsset* TextureDataAsset = Cast<UTextureDataAsset>(StaticLoadObject(UTextureDataAsset::StaticClass(), nullptr, TEXT("/LogoVM/Assets/TextureDataAsset.TextureDataAsset")));
+	if (!TextureDataAsset)
+	{
+		RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to load the texture data asset!"));
+		return nullptr;
+	}
 
-	const int32 TextureSizeX = CanvasSizeX * PixelSize;
-	const int32 TextureSizeY = CanvasSizeY * PixelSize;
+	TArray<FColor> OutPixels;
 	
-	if (!TryGeneratePixelsFromPixelSize(OutPixels, CanvasTilesColors, TextureSizeX, TextureSizeY, CanvasSizeX, PixelSize))
+	const double CanvasAspectRatio = static_cast<double>(CanvasDataAsset->CanvasWidth) / static_cast<double>(CanvasDataAsset->CanvasHeight);
+	const int32 TextureHeight = TextureDataAsset->TextureHeight;
+	// Width is automatically computed in order to keep the same aspect ratio of the canvas.
+	const int32 TextureWidth = FMath::RoundToInt(CanvasAspectRatio * TextureHeight);
+
+	if (!TryResamplingCanvas(OutPixels, CanvasTilesColors, TextureWidth, TextureHeight, CanvasDataAsset->CanvasWidth, CanvasDataAsset->CanvasHeight))
 	{
 		return nullptr;
 	}
 
 	FCreateTexture2DParameters Texture2DParameters;
-	return FImageUtils::CreateTexture2D(TextureSizeX, TextureSizeY, OutPixels, InParent, InName.ToString(), Flags, Texture2DParameters);
+	return FImageUtils::CreateTexture2D(TextureWidth, TextureHeight, OutPixels, InParent, InName.ToString(), Flags, Texture2DParameters);
 }
 
-bool ULogoVMFactory::TryGeneratePixelsFromPixelSize(TArray<FColor>& OutPixels, const TArray<FLinearColor>& CanvasTilesColors, const int32 InTextureSizeX, const int32 InTextureSizeY, const int32 InCanvasSizeX, const int32 InPixelSize)
+bool ULogoVMFactory::TryResamplingCanvas(TArray<FColor>& OutPixels, const TArray<FLinearColor>& CanvasTilesColors, const int32 InTextureWidth, const int32 InTextureHeight, const int32 InCanvasWidth, const int32 InCanvasHeight)
 {
-	OutPixels.AddDefaulted(CanvasTilesColors.Num() * static_cast<int32>((FMath::Pow(InPixelSize, 2.f))));
+	OutPixels.SetNum(InTextureWidth * InTextureHeight);
 
-	for (int32 Index = 0; Index < CanvasTilesColors.Num(); Index++)
+	// Normalization.
+	const float ScaleX = static_cast<float>(InCanvasWidth) / InTextureWidth;
+	const float ScaleY = static_cast<float>(InCanvasHeight) / InTextureHeight;
+
+	for (int32 Y = 0; Y < InTextureHeight; Y++)
 	{
-		FColor CurrentColor = CanvasTilesColors[Index].ToFColor(true);
-		
-		for (int32 HeightIndex = 0; HeightIndex < InPixelSize; HeightIndex++)
+		for (int32 X = 0; X < InTextureWidth; X++)
 		{
-			for (int32 WidthIndex = 0; WidthIndex < InPixelSize; WidthIndex++)
-			{
-				// Re-sampling from (CanvasSizeX * CanvasSizeY) grid to (TextureSizeX * TextureSizeY) grid.
-				const int32 NavigationFactor = ((Index / InCanvasSizeX) * InTextureSizeX + (Index % InCanvasSizeX));
-				const int32 CurrentIndex = (NavigationFactor * InPixelSize) + WidthIndex + (HeightIndex * InTextureSizeX);
+			const int32 PixelIndex = X + Y * InTextureWidth;
 
-				if (CurrentIndex < 0 || CurrentIndex >= OutPixels.Num())
-				{
-					UE_LOG(LoggerLogoVM, Error, TEXT("Unable to generate the texture: out of bounds during re-sampling!"))
-					return false;
-				}
-				
-				OutPixels[CurrentIndex] = CurrentColor;
+			const int32 CanvasX = FMath::Clamp(FMath::FloorToInt(X * ScaleX), 0, InCanvasWidth - 1);
+			const int32 CanvasY = FMath::Clamp(FMath::FloorToInt(Y * ScaleY), 0, InCanvasHeight - 1);
+
+			const int32 CanvasIndex = CanvasX + CanvasY * InCanvasWidth;
+
+			if (!CanvasTilesColors.IsValidIndex(CanvasIndex))
+			{
+				UE_LOG(LoggerLogoVM, Error, TEXT("Unable to generate the texture: out of bounds during re-sampling!"), CanvasIndex);
+				return false;
 			}
+
+			OutPixels[PixelIndex] = CanvasTilesColors[CanvasIndex].ToFColor(true);
 		}
 	}
-
+	
 	return true;
 }

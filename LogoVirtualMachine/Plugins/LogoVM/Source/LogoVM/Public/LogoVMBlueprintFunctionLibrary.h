@@ -14,8 +14,8 @@ public:
 
 	// Trick for abstract the world handler from blueprints.
 	UFUNCTION(BlueprintCallable, Category = "LogoVMBlueprintFunctionLibrary", meta = (WorldContext = "WorldContextObject"))
-	static bool LogoVMExecuteFromPath(UObject* WorldContextObject, const FString& Cmd, const int32 CanvasSizeX, const int32 CanvasSizeY, TArray<FLinearColor>& InCanvasTilesColors);
+	static bool LogoVMExecuteFromPath(UObject* WorldContextObject, const FString& Cmd, const int32 CanvasWidth, const int32 CanvasHeight, TArray<FLinearColor>& CanvasTilesColors);
 	
 	UFUNCTION(BlueprintCallable, Category = "LogoVMBlueprintFunctionLibrary", meta = (WorldContext = "WorldContextObject"))
-    static bool LogoVMExecuteFromContent(UObject* WorldContextObject, const FString& Content, const int32 CanvasSizeX, const int32 CanvasSizeY, TArray<FLinearColor>& InCanvasTilesColors);
+    static bool LogoVMExecuteFromContent(UObject* WorldContextObject, const FString& Content, const int32 CanvasWidth, const int32 CanvasHeight, TArray<FLinearColor>& CanvasTilesColors);
 };
