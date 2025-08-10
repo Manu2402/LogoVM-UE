@@ -38,5 +38,3 @@ bool FLogoVMLexerTest_Tokenize::RunTest(const FString& Parameters)
 	
 	return true;
 }
-
-// Add more tests (cover all commands).

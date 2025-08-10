@@ -46,6 +46,38 @@ namespace LogoVM
 			}
 		}
 
+		bool TryResamplingCanvas(TArray<FColor>& OutPixels, const TArray<FLinearColor>& CanvasTilesColors, const int32 InTextureWidth, const int32 InTextureHeight, const int32 InCanvasWidth, const int32 InCanvasHeight)
+		{
+			OutPixels.SetNum(InTextureWidth * InTextureHeight);
+
+			// Normalization.
+			const float ScaleX = static_cast<float>(InCanvasWidth) / InTextureWidth;
+			const float ScaleY = static_cast<float>(InCanvasHeight) / InTextureHeight;
+
+			for (int32 Y = 0; Y < InTextureHeight; Y++)
+			{
+				for (int32 X = 0; X < InTextureWidth; X++)
+				{
+					const int32 PixelIndex = X + Y * InTextureWidth;
+
+					const int32 CanvasX = FMath::Clamp(FMath::FloorToInt(X * ScaleX), 0, InCanvasWidth - 1);
+					const int32 CanvasY = FMath::Clamp(FMath::FloorToInt(Y * ScaleY), 0, InCanvasHeight - 1);
+
+					const int32 CanvasIndex = CanvasX + CanvasY * InCanvasWidth;
+
+					if (!CanvasTilesColors.IsValidIndex(CanvasIndex))
+					{
+						UE_LOG(LoggerLogoVM, Error, TEXT("Unable to generate the texture: out of bounds during re-sampling!"), CanvasIndex);
+						return false;
+					}
+
+					OutPixels[PixelIndex] = CanvasTilesColors[CanvasIndex].ToFColor(true);
+				}
+			}
+	
+			return true;
+		}
+
 		bool IsOutOfBounds(const FIntPoint Position, const FIntPoint CanvasSize)
 		{
 			return Position.X < 0 || Position.X >= CanvasSize.X || Position.Y < 0 || Position.Y >= CanvasSize.Y;
