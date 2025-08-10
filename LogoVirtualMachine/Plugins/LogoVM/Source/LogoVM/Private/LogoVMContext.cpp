@@ -2,6 +2,7 @@
 
 #include "LogoVMContext.h"
 #include "LogoVMUtils.h"
+#include "LogoVMBlueprintFunctionLibrary.h"
 #include "LogoVM.h"
 
 namespace LogoVM
@@ -38,6 +39,7 @@ namespace LogoVM
 	bool FLogoVMContext::Execute(TQueue<FString>& Tokens)
 	{
 		FString CurrentToken;
+		
 		while (Tokens.Dequeue(CurrentToken))
 		{
 			if (!Commands.Contains(CurrentToken))
@@ -211,6 +213,80 @@ namespace LogoVM
 			
 			return true;
 		});
+		Commands.Add(TEXT("repeat"), [this](TQueue<FString>& Tokens) -> bool
+		{
+			FString ArgToken;
+			Tokens.Dequeue(ArgToken);
+
+			if (!ArgToken.IsNumeric())
+			{
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"repeat\" command argument isn't a number!"));
+				return false;
+			}
+
+			int32 Arg = FCString::Atoi(*ArgToken);
+
+			if (Arg <= 1)
+			{
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"repeat\" command argument must be at least 2!"));
+				return false;
+			}
+
+			TQueue<FString> InnerTokens;
+			FString CurrentInnerToken;
+
+			// First token check.
+			if (!Tokens.Dequeue(CurrentInnerToken))
+			{
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"repeat\" command is failed to retreive it's body: tokens retreiving!"));
+				return false;
+			}
+
+			if (!CurrentInnerToken.Equals(TEXT("[")))
+			{
+				RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"repeat\" command is failed to retreive it's body: body isn't started with \"[\" token!"));
+				return false;
+			}
+
+			int32 NestedBodies = 1;
+
+			while (true)
+			{
+				if (!Tokens.Dequeue(CurrentInnerToken))
+				{
+					RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The \"repeat\" command is failed to retreive it's body: tokens retreiving!"));
+					return false;
+				}
+
+				if (CurrentInnerToken.Equals(TEXT("[")))
+				{
+					++NestedBodies;
+				} 
+				else if (CurrentInnerToken.Equals(TEXT("]")))
+				{
+					--NestedBodies;
+					if (NestedBodies <= 0)
+					{
+						break;
+					}
+				}
+
+				InnerTokens.Enqueue(CurrentInnerToken);
+			}
+
+			while (Arg-- > 0)
+			{
+				TQueue<FString> DumpInnerTokens;
+				DumpTokens(DumpInnerTokens, InnerTokens);
+				
+				if (!Execute(DumpInnerTokens))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		});
 #pragma endregion // Commands
 	}
 
@@ -278,6 +354,25 @@ namespace LogoVM
 			// Coloring.
 			CurrentIndex = (OldTurtlePosition.X + Steps.X) + ((OldTurtlePosition.Y + Steps.Y) * CanvasSize.X);
 			CanvasTilesColors[CurrentIndex] = ActiveColor;
+		}
+	}
+
+	void FLogoVMContext::DumpTokens(TQueue<FString>& OutDumpedTokens, TQueue<FString>& TokensToDump)
+	{
+		TArray<FString> Buffer;
+
+		// Dump in a new queue.
+		FString CurrentToken;
+		while (TokensToDump.Dequeue(CurrentToken))
+		{
+			Buffer.Add(CurrentToken);
+			OutDumpedTokens.Enqueue(CurrentToken);
+		}
+
+		// Restore original queue.
+		for (const FString& Token : Buffer)
+		{
+			TokensToDump.Enqueue(Token);
 		}
 	}
 }
