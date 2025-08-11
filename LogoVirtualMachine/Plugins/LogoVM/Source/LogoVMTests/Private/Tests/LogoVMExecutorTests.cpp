@@ -593,3 +593,143 @@ bool FLogoVMExecutorTest_PenColor::RunTest(const FString& Parameters)
 }
 
 #pragma endregion // PenColor
+
+#pragma region Repeat
+
+// "repeat" (complete command)
+// "repeat [ repeat [ ... ] ] (nested repeat)
+
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_RepeatStringArg, "LogoVM.Executor.Repeat.StringArg", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_RepeatStringArg::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM;
+
+	const FString LogoContent = TEXT("repeat number [ fd 10 ]");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	const bool bExecutionResult = LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The \"repeat\" command should take just a numeric value as an argument!"), bExecutionResult, false);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_RepeatValidArg, "LogoVM.Executor.Repeat.ValidArg", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_RepeatValidArg::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM;
+
+	const FString LogoContent = TEXT("repeat 1 [ fd 10 ]");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	const bool bExecutionResult = LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The \"repeat\" command should take just a numeric value > 1 as an argument!"), bExecutionResult, false);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_RepeatMissingBody, "LogoVM.Executor.Repeat.MissingBody", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_RepeatMissingBody::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM;
+
+	const FString LogoContent = TEXT("repeat 5");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	const bool bExecutionResult = LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The \"repeat\" command should have a body!"), bExecutionResult, false);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_RepeatVoidBody, "LogoVM.Executor.Repeat.VoidBody", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_RepeatVoidBody::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM;
+
+	const FString LogoContent = TEXT("repeat 5 [ ]");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	const bool bExecutionResult = LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The \"repeat\" command can have a void body!"), bExecutionResult, true);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_RepeatMissingOpenedSquareBracket, "LogoVM.Executor.Repeat.MissingOpenedSquareBracket", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_RepeatMissingOpenedSquareBracket::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM;
+
+	const FString LogoContent = TEXT("repeat 5 fd 10 ]");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	const bool bExecutionResult = LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The \"repeat\" command should have next to the argument an opened square bracket!"), bExecutionResult, false);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_RepeatMissingClosedSquareBracket, "LogoVM.Executor.Repeat.MissingClosedSquareBracket", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_RepeatMissingClosedSquareBracket::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM;
+
+	const FString LogoContent = TEXT("repeat 5 [ fd 10 ");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	const bool bExecutionResult = LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The \"repeat\" command should have a closed square bracket, in order to close the body!"), bExecutionResult, false);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_Repeat, "LogoVM.Executor.Repeat", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_Repeat::RunTest(const FString& Parameters)
+{
+	LogoVM::FLogoVMContext LogoVM = { FIntPoint(3), FIntPoint(0), 0, false, 0 };
+
+	const FString LogoContent = TEXT("repeat 4 [ fd 2 rt 90 ]");
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The turtle's position on X axis is not what it should be!"), LogoVM.GetTurtlePosition().X, 0);
+	TestEqual(TEXT("The turtle's position on Y axis is not what it should be!"), LogoVM.GetTurtlePosition().Y, 0);
+	
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_RepeatNested, "LogoVM.Executor.Repeat.Nested", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMExecutorTest_RepeatNested::RunTest(const FString& Parameters)
+{
+	const int32 CanvasSize = 20;
+	LogoVM::FLogoVMContext LogoVM = { FIntPoint(CanvasSize), FIntPoint(7), 270, false, 0 };
+
+	const FString LogoContent = TEXT("repeat 4 [ repeat 4 [ fd 3 rt 90 ] rt 90 fd 3 ]");
+
+	TQueue<FString> Tokens;
+
+	LogoVM::Utils::Tokenize(Tokens, LogoContent);
+	LogoVM.Execute(Tokens);
+
+	TestEqual(TEXT("The turtle's position on X axis is not what it should be!"), LogoVM.GetTurtlePosition().X, 7);
+	TestEqual(TEXT("The turtle's position on Y axis is not what it should be!"), LogoVM.GetTurtlePosition().Y, 7);
+	
+	return true;
+}
+
+#pragma endregion // Repeat

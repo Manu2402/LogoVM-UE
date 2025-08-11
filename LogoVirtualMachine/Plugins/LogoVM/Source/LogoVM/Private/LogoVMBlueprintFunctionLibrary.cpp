@@ -60,7 +60,7 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldCon
 
 	// LOGO Virtual Machine.
 	LogoVM::FLogoVMContext LogoVMContext = { FIntPoint(CanvasWidth, CanvasHeight), FIntPoint(CanvasWidth / 2, CanvasHeight / 2), 270, false, 0 };
-
+	
 	TArray<AActor*> CanvasTiles;
 	if (World)
 	{

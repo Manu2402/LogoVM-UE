@@ -29,7 +29,6 @@ namespace LogoVM
 		LOGOVM_API void Tokenize(TQueue<FString>& OutTokens, const FString& FileContent);
 	    LOGOVM_API bool TryResamplingCanvas(TArray<FColor>& OutPixels, const TArray<FLinearColor>& CanvasTilesColors, const int32 InTextureWidth, const int32 InTextureHeight, const int32 InCanvasWidth,  const int32 InCanvasHeight);
 		
-		
 		bool TrySpawnCanvas(TArray<AActor*>& OutCanvasTiles, UWorld* InWorld, FIntPoint CanvasSize);
 	}
 }
