@@ -13,28 +13,28 @@ bool FLogoVMLexerTest_Tokenize::RunTest(const FString& Parameters)
 	FString CurrentToken;
 
 	Tokens.Dequeue(CurrentToken);
-	TestEqual(FString::Printf(TEXT("The current token: %s should be equal to: %s)"), *CurrentToken, TEXT("repeat")), *CurrentToken, TEXT("repeat"));
+	TestEqual(TEXT("The current token doesn't match with the expected token!"), *CurrentToken, TEXT("repeat"));
 
 	Tokens.Dequeue(CurrentToken);
-	TestEqual(FString::Printf(TEXT("The current token: %s should be equal to: %s)"), *CurrentToken, TEXT("4")), *CurrentToken, TEXT("4"));
+	TestEqual(TEXT("The current token doesn't match with the expected token!"), *CurrentToken, TEXT("4"));
 
 	Tokens.Dequeue(CurrentToken);
-	TestEqual(FString::Printf(TEXT("The current token: %s should be equal to: %s)"), *CurrentToken, TEXT("[")), *CurrentToken, TEXT("["));
+	TestEqual(TEXT("The current token doesn't match with the expected token!"), *CurrentToken, TEXT("["));
 
 	Tokens.Dequeue(CurrentToken);
-	TestEqual(FString::Printf(TEXT("The current token: %s should be equal to: %s)"), *CurrentToken, TEXT("fd")), *CurrentToken, TEXT("fd"));
+	TestEqual(TEXT("The current token doesn't match with the expected token!"), *CurrentToken, TEXT("fd"));
 
 	Tokens.Dequeue(CurrentToken);
-	TestEqual(FString::Printf(TEXT("The current token: %s should be equal to: %s)"), *CurrentToken, TEXT("100")), *CurrentToken, TEXT("100"));
+	TestEqual(TEXT("The current token doesn't match with the expected token!"), *CurrentToken, TEXT("100"));
 
 	Tokens.Dequeue(CurrentToken);
-	TestEqual(FString::Printf(TEXT("The current token: %s should be equal to: %s)"), *CurrentToken, TEXT("rt")), *CurrentToken, TEXT("rt"));
+	TestEqual(TEXT("The current token doesn't match with the expected token!"), *CurrentToken, TEXT("rt"));
 
 	Tokens.Dequeue(CurrentToken);
-	TestEqual(FString::Printf(TEXT("The current token: %s should be equal to: %s)"), *CurrentToken, TEXT("90")), *CurrentToken, TEXT("90"));
+	TestEqual(TEXT("The current token doesn't match with the expected token!"), *CurrentToken, TEXT("90"));
 
 	Tokens.Dequeue(CurrentToken);
-	TestEqual(FString::Printf(TEXT("The current token: %s should be equal to: %s)"), *CurrentToken, TEXT("]")), *CurrentToken, TEXT("]"));
+	TestEqual(TEXT("The current token doesn't match with the expected token!"), *CurrentToken, TEXT("]"));
 	
 	return true;
 }

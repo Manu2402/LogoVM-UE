@@ -7,6 +7,11 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LoggerLogoVM, Log, All);
 
+#define CANVAS_DATA_ASSET_PATH "/LogoVM/Assets/CanvasDataAsset.CanvasDataAsset"
+#define TEXTURE_DATA_ASSET_PATH "/LogoVM/Assets/TextureDataAsset.TextureDataAsset"
+#define BLUEPRINT_CUBE_CLASS_PATH "/LogoVM/Blueprints/BP_Cube.BP_Cube_C"
+
+
 // Macro to avoid "runtime error logs" when automation tests are being performed.
 #define RUNTIME_LOG(CategoryName, Verbosity, FormatString, ...)         \
 	if (!GIsAutomationTesting)                                          \

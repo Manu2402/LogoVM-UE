@@ -86,7 +86,7 @@ namespace LogoVM
 
 					if (!CanvasTilesColors.IsValidIndex(CanvasIndex))
 					{
-						UE_LOG(LoggerLogoVM, Error, TEXT("Unable to generate the texture: out of bounds during re-sampling!"), CanvasIndex);
+						UE_LOG(LoggerLogoVM, Error, TEXT("Unable to generate the texture: out of bounds occurred during re-sampling!"), CanvasIndex);
 						return false;
 					}
 
@@ -108,11 +108,11 @@ namespace LogoVM
 			OutCanvasTiles.Empty(CanvasResolution);
 		
 			// Spawn canvas, composed by simple cubes as tiles.
-			UClass* CubeClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/LogoVM/Blueprints/BP_Cube.BP_Cube_C"));
+			UClass* CubeClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT(BLUEPRINT_CUBE_CLASS_PATH));
 
 			if (!CubeClass)
 			{
-				RUNTIME_LOG(LoggerLogoVM, Warning, TEXT("Unable to create the canvas: error when loading tile's body!"));
+				RUNTIME_LOG(LoggerLogoVM, Warning, TEXT("Unable to create the canvas: error during loading tile's body!"));
 				return false;
 			}
 
@@ -161,9 +161,7 @@ namespace LogoVM
 					OutCanvasTiles.Add(CanvasTile);
 				}
 			}
-
-			// FEATURE: Find a way to merge in one static mesh all the cubes.
-
+			
 			return true;
 		}
 	}

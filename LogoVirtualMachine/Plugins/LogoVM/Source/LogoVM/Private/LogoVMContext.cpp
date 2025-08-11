@@ -2,7 +2,6 @@
 
 #include "LogoVMContext.h"
 #include "LogoVMUtils.h"
-#include "LogoVMBlueprintFunctionLibrary.h"
 #include "LogoVM.h"
 
 namespace LogoVM
@@ -12,11 +11,11 @@ namespace LogoVM
 	static constexpr int32 DefaultTurtleRotation = 270; // UP (degrees).
 	static constexpr bool bDefaultIsTurtleUp = false;
 	
-	FLogoVMContext::FLogoVMContext() : CanvasSize(FIntPoint(DefaultCanvasSize)),
+	FLogoVMContext::FLogoVMContext() : DefaultBackgroundColor(Utils::AvailableColors[0]),
+	                                   CanvasSize(FIntPoint(DefaultCanvasSize)),
 		                               TurtlePosition(FIntPoint(DefaultTurtlePosition)),
 		                               TurtleRotation(DefaultTurtleRotation),
-	                                   bIsTurtleUp(bDefaultIsTurtleUp),
-		                               DefaultBackgroundColor(Utils::AvailableColors[0])
+	                                   bIsTurtleUp(bDefaultIsTurtleUp)
 	{
 		InitLogoVM();
 	}
@@ -26,12 +25,12 @@ namespace LogoVM
 	                               const int32 InTurtleRotation,
 	                               const bool bInIsTurtleUp,
 	                               const int32 InDefaultBackgroundColor) :
+	                               DefaultBackgroundColor(Utils::AvailableColors.IsValidIndex(InDefaultBackgroundColor) ? Utils::AvailableColors[InDefaultBackgroundColor]: Utils::AvailableColors[0]),
 	                               CanvasSize(InCanvasSize),
 	                               TurtlePosition(InTurtlePosition),
 								   // Recommended rotations (degrees): 0, 45, 90, 135, 180, 225, 270, 315, 360 
 	                               TurtleRotation(InTurtleRotation),
-								   bIsTurtleUp(bInIsTurtleUp),
-	                               DefaultBackgroundColor(Utils::AvailableColors.IsValidIndex(InDefaultBackgroundColor) ? Utils::AvailableColors[InDefaultBackgroundColor]: Utils::AvailableColors[0])
+								   bIsTurtleUp(bInIsTurtleUp)
 	{
 		InitLogoVM();
 	}
@@ -351,7 +350,7 @@ namespace LogoVM
 				Steps.Y += FMath::Sign(TurtleTraslation.Y);
 			}
 			
-			// Coloring.
+			// Coloring phase.
 			CurrentIndex = (OldTurtlePosition.X + Steps.X) + ((OldTurtlePosition.Y + Steps.Y) * CanvasSize.X);
 			CanvasTilesColors[CurrentIndex] = ActiveColor;
 		}

@@ -12,7 +12,7 @@ class LOGOVM_API UTextureDataAsset : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Canvas", meta = (ClampMin = 1))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Texture", meta = (ClampMin = 1))
 	int32 TextureHeight;
 	
 };

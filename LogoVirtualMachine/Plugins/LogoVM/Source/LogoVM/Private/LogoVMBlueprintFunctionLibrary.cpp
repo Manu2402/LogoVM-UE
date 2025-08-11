@@ -1,11 +1,10 @@
 // @ Manuel Solano
 
 #include "LogoVMBlueprintFunctionLibrary.h"
+#include "Misc/OutputDeviceNull.h"
 #include "LogoVMContext.h"
 #include "LogoVMUtils.h"
 #include "LogoVM.h"
-#include "Assets/CanvasDataAsset.h"
-#include "Misc/OutputDeviceNull.h"
 
 bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(UObject* WorldContextObject, const FString& Cmd, const int32 CanvasWidth, const int32 CanvasHeight, TArray<FLinearColor>& CanvasTilesColors)
 {
@@ -27,7 +26,7 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromPath(UObject* WorldContex
 	FString FileContent;
 	if (!FFileHelper::LoadFileToString(FileContent, *FilePath))
 	{
-		RUNTIME_LOG(LoggerLogoVM, Error, TEXT("The loading of \"%s\"'s content is failed!"), *FilePath);
+		RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Loading of \"%s\"'s content is failed!"), *FilePath);
 		return false;
 	}
 
@@ -38,7 +37,7 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldCon
 {
 	if (CanvasWidth <= 0 || CanvasHeight <= 0)
 	{
-		RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Invalid canvas resolution!"));
+		RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to create the canvas: invalid canvas resolution! (at least 1px on both width/height"));
 		return false;
 	}
 	
@@ -58,7 +57,7 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldCon
 	TQueue<FString> Tokens;
 	LogoVM::Utils::Tokenize(Tokens, Content);
 
-	// LOGO Virtual Machine.
+	// Default LOGO Virtual Machine.
 	LogoVM::FLogoVMContext LogoVMContext = { FIntPoint(CanvasWidth, CanvasHeight), FIntPoint(CanvasWidth / 2, CanvasHeight / 2), 270, false, 0 };
 	
 	TArray<AActor*> CanvasTiles;
@@ -101,6 +100,6 @@ bool ULogoVMBlueprintFunctionLibrary::LogoVMExecuteFromContent(UObject* WorldCon
 			return false;
 		}
 	}
-
+	
 	return true;
 }

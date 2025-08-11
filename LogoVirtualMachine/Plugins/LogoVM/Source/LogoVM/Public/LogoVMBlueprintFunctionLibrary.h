@@ -12,7 +12,7 @@ class LOGOVM_API ULogoVMBlueprintFunctionLibrary : public UBlueprintFunctionLibr
 public:
 	GENERATED_BODY()
 
-	// Trick for abstract the world handler from blueprints.
+	// "WorldContext" --> Trick for abstract the world handler from blueprints.
 	UFUNCTION(BlueprintCallable, Category = "LogoVMBlueprintFunctionLibrary", meta = (WorldContext = "WorldContextObject"))
 	static bool LogoVMExecuteFromPath(UObject* WorldContextObject, const FString& Cmd, const int32 CanvasWidth, const int32 CanvasHeight, TArray<FLinearColor>& CanvasTilesColors);
 	

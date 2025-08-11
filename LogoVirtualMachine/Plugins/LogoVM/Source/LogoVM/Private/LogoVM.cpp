@@ -24,10 +24,10 @@ namespace LogoVM
 
 	bool FLogoVMModule::Exec(UWorld* InWorld, const TCHAR* Cmd /* Commands stream */, FOutputDevice& Ar /* Console */)
 	{
-		UCanvasDataAsset* CanvasDataAsset = Cast<UCanvasDataAsset>(StaticLoadObject(UCanvasDataAsset::StaticClass(), nullptr, TEXT("/LogoVM/Assets/CanvasDataAsset.CanvasDataAsset")));
+		UCanvasDataAsset* CanvasDataAsset = Cast<UCanvasDataAsset>(StaticLoadObject(UCanvasDataAsset::StaticClass(), nullptr, TEXT(CANVAS_DATA_ASSET_PATH)));
 		if (!CanvasDataAsset)
 		{
-			RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to load the canvas data asset!"));
+			RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to load the \"Canvas Data Asset\"!"));
 			return false;
 		}
 		

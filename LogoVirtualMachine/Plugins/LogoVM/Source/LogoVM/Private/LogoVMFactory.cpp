@@ -18,7 +18,7 @@ ULogoVMFactory::ULogoVMFactory()
 
 UObject* ULogoVMFactory::FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled)
 {
-	UCanvasDataAsset* CanvasDataAsset = Cast<UCanvasDataAsset>(StaticLoadObject(UCanvasDataAsset::StaticClass(), nullptr, TEXT("/LogoVM/Assets/CanvasDataAsset.CanvasDataAsset")));
+	UCanvasDataAsset* CanvasDataAsset = Cast<UCanvasDataAsset>(StaticLoadObject(UCanvasDataAsset::StaticClass(), nullptr, TEXT(CANVAS_DATA_ASSET_PATH)));
 	if (!CanvasDataAsset)
 	{
 		RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to load the canvas data asset!"));
@@ -33,7 +33,7 @@ UObject* ULogoVMFactory::FactoryCreateFile(UClass* InClass, UObject* InParent, F
 		return nullptr;
 	}
 
-	UTextureDataAsset* TextureDataAsset = Cast<UTextureDataAsset>(StaticLoadObject(UTextureDataAsset::StaticClass(), nullptr, TEXT("/LogoVM/Assets/TextureDataAsset.TextureDataAsset")));
+	UTextureDataAsset* TextureDataAsset = Cast<UTextureDataAsset>(StaticLoadObject(UTextureDataAsset::StaticClass(), nullptr, TEXT(TEXTURE_DATA_ASSET_PATH)));
 	if (!TextureDataAsset)
 	{
 		RUNTIME_LOG(LoggerLogoVM, Error, TEXT("Unable to load the texture data asset!"));
@@ -44,7 +44,7 @@ UObject* ULogoVMFactory::FactoryCreateFile(UClass* InClass, UObject* InParent, F
 	
 	const double CanvasAspectRatio = static_cast<double>(CanvasDataAsset->CanvasWidth) / static_cast<double>(CanvasDataAsset->CanvasHeight);
 	const int32 TextureHeight = TextureDataAsset->TextureHeight;
-	// Width is automatically computed in order to keep the same aspect ratio of the canvas.
+	// "Width" is automatically computed in order to keep the same aspect ratio of the canvas.
 	const int32 TextureWidth = FMath::RoundToInt(CanvasAspectRatio * TextureHeight);
 
 	if (!LogoVM::Utils::TryResamplingCanvas(OutPixels, CanvasTilesColors, TextureWidth, TextureHeight, CanvasDataAsset->CanvasWidth, CanvasDataAsset->CanvasHeight))

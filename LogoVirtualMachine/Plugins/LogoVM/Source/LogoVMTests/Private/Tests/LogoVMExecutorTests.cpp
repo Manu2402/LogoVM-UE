@@ -596,10 +596,6 @@ bool FLogoVMExecutorTest_PenColor::RunTest(const FString& Parameters)
 
 #pragma region Repeat
 
-// "repeat" (complete command)
-// "repeat [ repeat [ ... ] ] (nested repeat)
-
-
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMExecutorTest_RepeatStringArg, "LogoVM.Executor.Repeat.StringArg", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FLogoVMExecutorTest_RepeatStringArg::RunTest(const FString& Parameters)
 {
