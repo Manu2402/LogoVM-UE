@@ -26,8 +26,9 @@ namespace LogoVM
 		
 		LOGOVM_API bool FilePathIsValid(const FString& FilePath);
 		LOGOVM_API bool IsOutOfBounds(const FIntPoint Position, const FIntPoint CanvasSize);
-		LOGOVM_API void Tokenize(TQueue<FString>& OutTokens, const FString& FileContent);
 	    LOGOVM_API bool TryResamplingCanvas(TArray<FColor>& OutPixels, const TArray<FLinearColor>& CanvasTilesColors, const int32 InTextureWidth, const int32 InTextureHeight, const int32 InCanvasWidth,  const int32 InCanvasHeight);
+		LOGOVM_API void Tokenize(TQueue<FString>& OutTokens, const FString& FileContent);
+		LOGOVM_API void DumpTokens(TQueue<FString>& OutDumpedTokens, TQueue<FString>& TokensToDump);
 		
 		bool TrySpawnCanvas(TArray<AActor*>& OutCanvasTiles, UWorld* InWorld, FIntPoint CanvasSize);
 	}

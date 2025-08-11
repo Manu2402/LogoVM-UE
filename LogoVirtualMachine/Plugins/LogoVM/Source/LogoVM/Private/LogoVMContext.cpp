@@ -277,7 +277,7 @@ namespace LogoVM
 			while (Arg-- > 0)
 			{
 				TQueue<FString> DumpInnerTokens;
-				DumpTokens(DumpInnerTokens, InnerTokens);
+				Utils::DumpTokens(DumpInnerTokens, InnerTokens);
 				
 				if (!Execute(DumpInnerTokens))
 				{
@@ -354,25 +354,6 @@ namespace LogoVM
 			// Coloring.
 			CurrentIndex = (OldTurtlePosition.X + Steps.X) + ((OldTurtlePosition.Y + Steps.Y) * CanvasSize.X);
 			CanvasTilesColors[CurrentIndex] = ActiveColor;
-		}
-	}
-
-	void FLogoVMContext::DumpTokens(TQueue<FString>& OutDumpedTokens, TQueue<FString>& TokensToDump)
-	{
-		TArray<FString> Buffer;
-
-		// Dump in a new queue.
-		FString CurrentToken;
-		while (TokensToDump.Dequeue(CurrentToken))
-		{
-			Buffer.Add(CurrentToken);
-			OutDumpedTokens.Enqueue(CurrentToken);
-		}
-
-		// Restore original queue.
-		for (const FString& Token : Buffer)
-		{
-			TokensToDump.Enqueue(Token);
 		}
 	}
 }

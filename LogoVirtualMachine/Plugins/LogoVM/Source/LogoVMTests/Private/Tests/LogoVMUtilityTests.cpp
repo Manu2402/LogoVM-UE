@@ -80,3 +80,45 @@ bool FLogoVMUtility_CanvasResample::RunTest(const FString& Parameters)
 
 	return true;
 }
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLogoVMUtility_DumpTokens, "LogoVM.Utility.DumpTokens", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FLogoVMUtility_DumpTokens::RunTest(const FString& Parameters)
+{
+	TQueue<FString> OutDumpedTokens;
+
+	TQueue<FString> TokensToDump;
+	TokensToDump.Enqueue(TEXT("fd"));
+	TokensToDump.Enqueue(TEXT("10"));
+	TokensToDump.Enqueue(TEXT("rt"));
+	TokensToDump.Enqueue(TEXT("90"));
+	TokensToDump.Enqueue(TEXT("ct"));
+
+	LogoVM::Utils::DumpTokens(OutDumpedTokens, TokensToDump);
+	
+	FString OutDumpedTokens_CurrentToken;
+	FString TokensToDump_CurrentToken;
+	
+	OutDumpedTokens.Dequeue(OutDumpedTokens_CurrentToken);
+	TokensToDump.Dequeue(TokensToDump_CurrentToken);
+	TestEqual(TEXT("The dumped token doesn't match with the original token to dump!"), OutDumpedTokens_CurrentToken, TokensToDump_CurrentToken);
+
+	OutDumpedTokens.Dequeue(OutDumpedTokens_CurrentToken);
+	TokensToDump.Dequeue(TokensToDump_CurrentToken);
+	TestEqual(TEXT("The dumped token doesn't match with the original token to dump!"), OutDumpedTokens_CurrentToken, TokensToDump_CurrentToken);
+
+	OutDumpedTokens.Dequeue(OutDumpedTokens_CurrentToken);
+	TokensToDump.Dequeue(TokensToDump_CurrentToken);
+	TestEqual(TEXT("The dumped token doesn't match with the original token to dump!"), OutDumpedTokens_CurrentToken, TokensToDump_CurrentToken);
+
+	OutDumpedTokens.Dequeue(OutDumpedTokens_CurrentToken);
+	TokensToDump.Dequeue(TokensToDump_CurrentToken);
+	TestEqual(TEXT("The dumped token doesn't match with the original token to dump!"), OutDumpedTokens_CurrentToken, TokensToDump_CurrentToken);
+
+	OutDumpedTokens.Dequeue(OutDumpedTokens_CurrentToken);
+	TokensToDump.Dequeue(TokensToDump_CurrentToken);
+	TestEqual(TEXT("The dumped token doesn't match with the original token to dump!"), OutDumpedTokens_CurrentToken, TokensToDump_CurrentToken);
+
+	TestEqual(TEXT("Both queues should are empty!"), OutDumpedTokens.IsEmpty(), TokensToDump.IsEmpty());
+	
+	return true;
+}

@@ -47,7 +47,6 @@ namespace LogoVM
 	private:
 		void InitLogoVM();
 		void Move(const FIntPoint OldTurtlePosition, const FIntPoint TurtleTraslation);
-		void DumpTokens(TQueue<FString>& OutDumpedTokens, TQueue<FString>& TokensToDump);
 		
 		FVector2D GetTurtleRotationVector() const;
 		

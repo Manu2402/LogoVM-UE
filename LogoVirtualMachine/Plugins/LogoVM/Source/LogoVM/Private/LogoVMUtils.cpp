@@ -46,6 +46,25 @@ namespace LogoVM
 			}
 		}
 
+		void DumpTokens(TQueue<FString>& OutDumpedTokens, TQueue<FString>& TokensToDump)
+		{
+			TArray<FString> Buffer;
+
+			// Dump in a new queue.
+			FString CurrentToken;
+			while (TokensToDump.Dequeue(CurrentToken))
+			{
+				Buffer.Add(CurrentToken);
+				OutDumpedTokens.Enqueue(CurrentToken);
+			}
+
+			// Restore original queue.
+			for (const FString& Token : Buffer)
+			{
+				TokensToDump.Enqueue(Token);
+			}
+		}
+
 		bool TryResamplingCanvas(TArray<FColor>& OutPixels, const TArray<FLinearColor>& CanvasTilesColors, const int32 InTextureWidth, const int32 InTextureHeight, const int32 InCanvasWidth, const int32 InCanvasHeight)
 		{
 			OutPixels.SetNum(InTextureWidth * InTextureHeight);
