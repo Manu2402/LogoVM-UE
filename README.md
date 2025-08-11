@@ -1,7 +1,7 @@
 # LogoVM-UE
 
 ## Overview
-- A simple Unreal Engine 5 plugin that deals with a virtual execution/interpretation environment (<b>Virtual Machine</b>) for programs written using the <i>LOGO programming language</i> <br>
+- A simple Unreal Engine 5(.6.X) plugin that deals with a virtual execution/interpretation environment (<b>Virtual Machine</b>) for programs written using the <i>LOGO programming language</i> <br>
 - LOGO is a very simple interpreted language, which in its most minimal form provides basic commands for drawing on a canvas using a “brush” (turtle) <br>
 - For more information about the LOGO language, visit: https://en.wikipedia.org/wiki/Logo_(programming_language)
 
