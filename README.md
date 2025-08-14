@@ -29,7 +29,7 @@
 - <b>ct</b> (CENTER TURTLE)
 - <b>cs</b> (CLEAR SCREEN)
 - <b>pu</b> (PEN UP)
-- pd</b> (PEN DOWN)
+- <b>pd</b> (PEN DOWN)
 - <b>pc</b> "color id" (PEN COLOR)
 - <b>repeat</b> "cycles" [...] (REPEAT)
 
